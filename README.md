@@ -29,3 +29,7 @@ Skull Atlas 2016
 
 This repository is meant to store the prototype Skull Atlas as created by CVC
 for the Dell Medical School.
+
+### Components
+
+The files in `file_converters` provide methods for converting between different file formats. They should have individual README files (probably short) to describe how you use them.

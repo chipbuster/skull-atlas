@@ -1,4 +1,3 @@
-
 # Created by https://www.gitignore.io/api/c,c++,emacs,osx,python,vim,visualstudio,xcode,osx
 
 ### C ###
@@ -557,6 +556,9 @@ Temporary Items
 .apdisk
 
 # Our own goddamn data
-.rawiv
-.rawv
-.rawc
+*.rawiv
+*.rawv
+*.rawc
+*.raw
+*.rawn
+*.rawnc
