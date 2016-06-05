@@ -2,11 +2,15 @@
 sudo: required
 dist: trusty
 
-addons:
-  packages:
-    - g++
-    - libcgal-dev
+# Doesn't seem to be working
+#addons:
+#  packages:
+#    - g++
+#    - libcgal-dev
 
+
+before_install:
+    - sudo apt-get install libcgal-dev
 # Enable C++ support
 language: cpp
 # Compiler selection
