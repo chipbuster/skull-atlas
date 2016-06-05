@@ -1,5 +1,5 @@
 #include <algorithm>
-#include <cstdint>
+#include <stdint.h>
 #include "wave.h"
 #include "wavedata.h"
 #include "block.h"
