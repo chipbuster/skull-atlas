@@ -5,6 +5,7 @@ dist: trusty
 addons:
   packages:
     - g++
+    - libcgal-dev
 
 # Enable C++ support
 language: cpp
