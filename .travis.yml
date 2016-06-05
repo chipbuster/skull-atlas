@@ -1,0 +1,19 @@
+# Force enabling of Ubuntu 14.04
+sudo: required
+dist: trusty
+
+addons:
+  packages:
+    - g++
+
+# Enable C++ support
+language: cpp
+# Compiler selection
+compiler:
+  - clang
+  - gcc
+# Build steps
+script:
+  - mkdir build
+  - cd build
+  - cmake .. && make

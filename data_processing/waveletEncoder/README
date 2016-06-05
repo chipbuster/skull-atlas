@@ -1,0 +1,27 @@
+Sample usage:
+  ./pdb menge81_float.rawiv 0.5 outfile
+
+"outfile0.5rec.rawiv" and "outfile0.5type3.whb" will be generated.
+
+==========
+
+ZSMS table version 2:
+8 vertexes
+level lvl ZSMS
+level lvl-1 ZSMS
+...........
+level 2 ZSMS
+level 1 ZSMS index
+level 1 ZSMS
+
+ZSMS table version 3:
+one bit for each level(lvl to 1)
+level lvl ZSMS(if the bit of level lvl is 1)
+level lvl-1 ZSMS(if the bit of level lvl-1 is 1)
+...........
+level 2 ZSMS(if the bit of level 2 is 1)
+level 1 ZSMS index(if the bit of level 1 is 1)
+level 1 ZSMS(if the bit of level 1 is 1)
+
+The encoder program only works when ZSMS_type == 1 or 3
+The decoder program only works when ZSMS_type == 3
