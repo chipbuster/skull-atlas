@@ -1,6 +1,8 @@
 Skull Atlas 2016
 ================
 
+![Travis Status](https://travis-ci.com/chipbuster/skull-atlas.svg?token=JKmHgBdX7axXPFzjazNA)
+
 ```
          _,.-------.,_
      ,;~'             '~;,
@@ -72,6 +74,6 @@ not entirely clear.
 
 The files in `cgal_dummy` are just to make sure that the build system (TravisCI)
 and CGAL are working as intended. The tests are pulled
-from[the latest CGAL introduction](http://doc.cgal.org/latest/Manual/introduction.html).
+from [the latest CGAL introduction](http://doc.cgal.org/latest/Manual/introduction.html).
 This directory will probably be removed later if it is determined that it is no
 longer needed.
