@@ -8,9 +8,12 @@ dist: trusty
 #    - g++
 #    - libcgal-dev
 
-
 before_install:
     - sudo apt-get install -y libcgal-dev
+    # Ubuntu does not provide libboost_thread-mt because fuck you that's why
+    # We need to link libboost_thread-mt to libboost_thread to fix this.
+    - sudo ln -s /usr/lib/x86_64-linux-gnu/libboost_thread.so /usr/lib/x86_64-linux-gnu/libboost_thread-mt.so
+    - sudo ln -s /usr/lib/x86_64-linux-gnu/libboost_thread.a /usr/lib/x86_64-linux-gnu/libboost_thread-mt.a
 # Enable C++ support
 language: cpp
 # Compiler selection
