@@ -5,24 +5,20 @@ cmake_minimum_required (VERSION 2.8)
 ## This should set BOOST_THREAD_LIBRARIES, CGAL_LIBRARIES,
 #                  GMP_LIBRARIES, and MPFR_LIBRARIES
 
-find_package(CGAL
-            REQUIRED)
+# List your required libraries here
+find_package(CGAL REQUIRED COMPONENTS Core ImageIO )
+include( ${CGAL_USE_FILE} ) #Important!! CGAL vars won't work without it
 
-find_package(Boost
-             REQUIRED
-             thread-mt)
-
-#add_executable(test_ach2 array_convex_hull_2.cpp)
 add_executable(test_pas points_and_segments.cpp)
 add_executable(test_sup surprising.cpp)
 add_executable(test_ext exact.cpp)
 add_executable(test_ach array_convex_hull_2.cpp)
 add_executable(test_vch vector_convex_hull_2.cpp)
 
-target_link_libraries(test_pas ${CGAL_LIB})
-target_link_libraries(test_sup ${CGAL_LIB})
-target_link_libraries(test_ext ${CGAL_LIB} ${MPFR_LIBRARIES} ${GMP_LIBRARIES} ${Boost_LIBRARIES})
-target_link_libraries(test_ach ${CGAL_LIB} ${MPFR_LIBRARIES} ${GMP_LIBRARIES} ${Boost_LIBRARIES})
-target_link_libraries(test_vch ${CGAL_LIB} ${MPFR_LIBRARIES} ${GMP_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(test_pas ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} )
+target_link_libraries(test_sup ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} )
+target_link_libraries(test_ext ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} )
+target_link_libraries(test_ach ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} )
+target_link_libraries(test_vch ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} )
 
 install (TARGETS test_pas test_sup test_ext test_ach test_vch DESTINATION bin)
