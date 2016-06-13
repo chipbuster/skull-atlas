@@ -3,7 +3,7 @@ sudo: required
 dist: trusty
 
 before_install:
-    - sudo apt-get install -y m4 build-essential gfortran freeglut3-dev qt4-dev-tools libgmp3-dev libmpfr-dev 
+    - sudo apt-get install -y m4 build-essential gfortran freeglut3-dev qt4-dev-tools libgmp3-dev libmpfr-dev libboost-all-dev
 
     # Ubuntu does not provide libboost_thread-mt because fuck you that's why
     # We need to link libboost_thread-mt to libboost_thread to fix this.
