@@ -2,18 +2,23 @@
 sudo: required
 dist: trusty
 
-# Doesn't seem to be working
-#addons:
-#  packages:
-#    - g++
-#    - libcgal-dev
-
 before_install:
-    - sudo apt-get install -y libcgal-dev m4 build-essential gfortran freeglut3-dev qt4-dev-tools
+    - sudo apt-get install -y m4 build-essential gfortran freeglut3-dev qt4-dev-tools libgmp3-dev libmpfr-dev libboost-all-dev
+
     # Ubuntu does not provide libboost_thread-mt because fuck you that's why
     # We need to link libboost_thread-mt to libboost_thread to fix this.
     - sudo ln -s /usr/lib/x86_64-linux-gnu/libboost_thread.so /usr/lib/x86_64-linux-gnu/libboost_thread-mt.so
     - sudo ln -s /usr/lib/x86_64-linux-gnu/libboost_thread.a /usr/lib/x86_64-linux-gnu/libboost_thread-mt.a
+
+    # Get CGAL source and install it (4.8.1, this should be relatively quick)
+    - wget https://github.com/CGAL/cgal/archive/releases/CGAL-4.8.1.tar.gz
+    - tar xf CGAL-4.8.1.tar.gz
+    - cd cgal-releases-CGAL-4.8.1
+    - cmake .
+    - make
+    - sudo make install
+    - cd ..
+
 # Enable C++ support
 language: cpp
 # Compiler selection
