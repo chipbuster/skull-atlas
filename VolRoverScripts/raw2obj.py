@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 #############################
 # Script that will convert VolRover's .raw file to a more usable (i.e. by Blender)
-# .obj file format. It's basically just a regex, except the faces in the .raw file 
+# .obj file format. It's basically just a regex, except the faces in the .raw file
 # are zero-indexed instead of 1 (reqired by .obj). So we'll do that here.
 #############################
 
