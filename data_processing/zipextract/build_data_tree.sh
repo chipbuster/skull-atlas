@@ -19,14 +19,29 @@
 # Strict mode for bash: http://redsymbol.net/articles/unofficial-bash-strict-mode/
 set -euo pipefail
 
-# If GNU parallel is installed, use it. Otherwise use xargs.
+# Which directory is the script stored in?
+SCRIPTDIR="$(dirname "$(readlink -f "$0")")"
 
+# APPLICATIONS SECTION
+###################################################################
+
+# Here we set several variables corresponding to paths programs we need.
+case "$OSTYPE" in
+    darwin*)  NUMCPUS=$(sysctl -n hw.ncpu) ;;
+    linux*)   NUMCPUS=$(grep -c '^processor' /proc/cpuinfo) ;;
+    *)        NUMCPUS=1 ;;
+esac
+
+# If GNU parallel is installed, use it. Otherwise use xargs.
 XARGS=xargs
 hash parallel 2>/dev/null && XARGS=parallel
 
-# If needed, we can change the prefix for gdcmconv (though it will most likely just be )
+# Grassroots DICOM converter: location may change
+CONVERT="$SCRIPTDIR/gdcm-2.6.3/build/bin/gdcmconv"
+hash $CONVERT 2>/dev/null || echo "The Grassroots DICOM converter was not found at $CONVERT"
 
-echo $XARGS
+###################################################################
+# END APPLICATIONS SECTION
 
 # If either $1 or $2 is empty, give usage info
 if [ "${1:-undef}" = "undef"  ] || [ "${2:-undef}" = "undef" ] || [ "$1" = "-help" ] || [ "$1" = "--help" ]; then
@@ -54,7 +69,7 @@ WORKDIR="$(pwd)"
 
 #Not documented--let the user force an in-place unpacking. Untested!
 if [ "$1" = "--force" ]; then
-    WORKDIR="$2"
+    WORKDIR="$(pwd)/$2"
     IN_DIR_UNPACK=YES
 
     echo "######################################"
@@ -73,7 +88,7 @@ if [ "$1" = "--force" ]; then
 
 else
     BOXDIR="$1"
-    WORKDIR="$2"
+    WORKDIR="$(readlink -f "$2")"
 fi
 
 # If not forcing an in-place unpacking, copy Box data to working dir
@@ -85,7 +100,11 @@ if [ $IN_DIR_UNPACK = "NO" ]; then
 fi
 
 # Remainder of script should take place within WORKDIR
-cd $WORKDIR
+cd "$WORKDIR"
+
+##########################
+## BEGIN UNPACKING LOOP ##
+##########################
 
 # From here, we want to loop over each directory in the directory tree of WORKDIR
 # and unzip the archive. From there, we will have to handle several different cases
@@ -111,15 +130,13 @@ find $(pwd) -type d | while read DIR; do #Loop over all directories in pwd
         continue #Probably removed by the SynapseMediaSets culler, skip this directory
     fi
 
-
-    echo "Now in $(pwd)"
+    echo "Extracting images in $(pwd)"
 
     find "$(pwd)" -maxdepth 1 -name '*.zip' | while read ZIPFILE; do #Loop over all zipfiles in each dir
 
-        NUMID=$(basename -s .zip "$ZIPFILE") #The number assigned to the patient. File is
-                                  # guaranteed to have .zip suffix because of our earlier
+        NUMID=$(basename -s .zip "$ZIPFILE") #The number assigned to the patient.
 
-        unzip -o "$ZIPFILE" > /dev/null
+        unzip -o "$ZIPFILE" > /dev/null #-o forces overwrite if files already exist
 
         ## We seek to organize the data into the structure described in the README.
         # Once we unzip the zipfile, there are a few possibilities:
@@ -185,15 +202,58 @@ find $(pwd) -type d | while read DIR; do #Loop over all directories in pwd
         fi
 
         # Now the DICOM images are in $NUMID/DICOMOBJ. Make the other two directories.
-        mkdir "$NUMID"/VOLIMG         # For volumetric images
-        mkdir "$NUMID"/METADATA       # For metadata dumps
-        mkdir "$NUMID"/DICOMUNC       # For uncompressed DICOM images
+        if [ -d "$NUMID/DICOMOBJ" ]; then
+          mkdir "$NUMID"/VOLIMG         # For volumetric images
+          mkdir "$NUMID"/METADATA       # For metadata dumps
+          mkdir "$NUMID"/DICOMUNC       # For uncompressed DICOM images
+        fi
 
-        ## Now the unpacking is done. We would like to do two things: transform the data
-        ## into RAWIV form and place in the PROCIMG directory, and dump the image
-        ## metadata into the METADATA directory.
 
-        # For the time being, we will use the MATLAB scripts to accomplish this. This ma
-        # be supplanted by a GDCM (Grassroots DICOM) reader program later on.
     done
+done
+
+########################
+## END UNPACKING LOOP ##
+########################
+
+## We can now pass the extracted images to the RAWIV generation. Oh wait, we
+## can't, because it's in a compressed form which PyDICOM can't handle. Arrrrgh.
+## To solve this, use gdcmconv (bound to $CONVERT variable) to convert each
+## image into a RAW encoding. Store these in DICOMUNC as specified by README.
+
+cd "$WORKDIR"
+
+echo "Preparing to convert compressed DICOM to RAW DICOM"
+echo "The error \"Could not read (pixmap)\" here most likely indicates"
+echo "corrupted or missing DICOM data."
+echo ""
+
+find $(pwd) -type d | while read DIR; do #Loop over all directories in pwd
+
+    cd "$DIR"
+
+    if [ ! -d "DICOMOBJ" ]; then
+        continue # We are not needed here.
+    fi
+
+    if [ ! -d "DICOMUNC" ]; then
+        echo "[ ERR ] DICOMUNC not found!"
+        echo "In path $DIR"
+        exit 1
+    fi
+
+    NUMID="$(basename "$DIR")"
+
+    echo "Decoding images for patient $NUMID"
+
+
+    ## Allow pipe failures for this part of the script--some images are inherently corrupted
+    set +o pipefail
+
+    ## We should now be in a patient's directory. Use Xargs/parallel to convert images.
+    cd "DICOMOBJ"
+    find . -maxdepth 1 -type f -printf "%f\n" | $XARGS -P $NUMCPUS -I {} "$CONVERT" -w {} ../DICOMUNC/{} || true
+
+    set -o pipefail
+
 done

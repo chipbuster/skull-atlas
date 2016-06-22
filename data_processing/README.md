@@ -20,3 +20,6 @@ The target directory structure is as follows:
    - A directory named PIPELINE that holds temporary files used by the processing pipeline
 
 Prerequisites are:
+    * A C/C++/Fortran compiler
+    * Python 3
+    * CMake
