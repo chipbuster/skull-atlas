@@ -24,6 +24,8 @@ set -euo pipefail
 XARGS=xargs
 hash parallel 2>/dev/null && XARGS=parallel
 
+# If needed, we can change the prefix for gdcmconv (though it will most likely just be )
+
 echo $XARGS
 
 # If either $1 or $2 is empty, give usage info
@@ -91,10 +93,12 @@ cd $WORKDIR
 
 find $(pwd) -type d | while read DIR; do #Loop over all directories in pwd
 
-    if [[ "$(basename "$DIR")" != *[!0-9]* ]]; then #$DIR is valid as a number: probably an existing folder
+    # If we find a numeric-only name, this directory might have already been unpacked
+    if [[ "$(basename "$DIR")" != *[!0-9]* ]]; then
         echo "[WARN]: Numeric directory name found!"
-        echo "Have you already partially processed this directory?"
+        echo "Have you already partially processed this tree?"
         continue
+    # If we find SynapseMediaSets, we need to remove it and skip it so we don't try to walk it by mistake
     elif [ "$(basename "$DIR")" = "SynapseMediaSets" ]; then
         echo "[WARN]: Found SynapseMediaSet in directory. Culling..."
         rm -rf "$DIR"
@@ -104,7 +108,7 @@ find $(pwd) -type d | while read DIR; do #Loop over all directories in pwd
     if [ -d "$DIR" ]; then
         cd "$DIR" #Unzip dumps content in current working dir, so cd to $DIR to let it happen there
     else
-        continue #Probably removed by the basename culler above
+        continue #Probably removed by the SynapseMediaSets culler, skip this directory
     fi
 
 
@@ -117,19 +121,11 @@ find $(pwd) -type d | while read DIR; do #Loop over all directories in pwd
 
         unzip -o "$ZIPFILE" > /dev/null
 
-        ## We seek to organize the data into the following structure:
-        ##  - A top-level directory that is named with the identifier ($NUMID)
-        ##     - A directory named DICOMOBJ that contains the raw DICOM data
-        ##     - A directory named VOLIM that contains the volumetric images (e.g. rawiv/inr)
-        ##     - A directory named METADATA that contains the processed and raw metadata
-        ##
-        ##     TENTATIVE SUGGESTIONS:
-        ##     - A directory named PIPELINE that holds temporary files used by the processing pipeline
-
+        ## We seek to organize the data into the structure described in the README.
         # Once we unzip the zipfile, there are a few possibilities:
 
         #  (1) We find a directory with the same NUMID as the zipfile. Great!
-        #      Move all of its contents into a tempdir and then rename.
+        #      Move all of its contents into a temporary dir to create the structure.
 
         if [ -d "$NUMID" ]; then
             mkdir ./tempdir
@@ -189,8 +185,9 @@ find $(pwd) -type d | while read DIR; do #Loop over all directories in pwd
         fi
 
         # Now the DICOM images are in $NUMID/DICOMOBJ. Make the other two directories.
-        mkdir "$NUMID"/VOLIMG
-        mkdir "$NUMID"/METADATA
+        mkdir "$NUMID"/VOLIMG         # For volumetric images
+        mkdir "$NUMID"/METADATA       # For metadata dumps
+        mkdir "$NUMID"/DICOMUNC       # For uncompressed DICOM images
 
         ## Now the unpacking is done. We would like to do two things: transform the data
         ## into RAWIV form and place in the PROCIMG directory, and dump the image
