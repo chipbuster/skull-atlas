@@ -19,6 +19,13 @@
 # Strict mode for bash: http://redsymbol.net/articles/unofficial-bash-strict-mode/
 set -euo pipefail
 
+# If GNU parallel is installed, use it. Otherwise use xargs.
+
+XARGS=xargs
+hash parallel 2>/dev/null && XARGS=parallel
+
+echo $XARGS
+
 # If either $1 or $2 is empty, give usage info
 if [ "${1:-undef}" = "undef"  ] || [ "${2:-undef}" = "undef" ] || [ "$1" = "-help" ] || [ "$1" = "--help" ]; then
     echo "Usage: $0 <Box Sync Directory> <Working Directory>"
@@ -81,7 +88,6 @@ cd $WORKDIR
 # From here, we want to loop over each directory in the directory tree of WORKDIR
 # and unzip the archive. From there, we will have to handle several different cases
 # to make sure that we handle things correctly.
-
 
 find $(pwd) -type d | while read DIR; do #Loop over all directories in pwd
 
