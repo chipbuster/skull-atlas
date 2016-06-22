@@ -653,7 +653,8 @@ endif()
 
 #-----------------------------------------------------------------------------
 if(GDCM_STANDALONE)
-  option(GDCM_BUILD_APPLICATIONS "apps ?" OFF)
+    option(GDCM_BUILD_APPLICATIONS "apps ?" ON)
+    option(GDCM_DOCUMENTATION_SKIP_MANPAGES "Do you want your application to work?" ON)
   set(BUILD_APPLICATIONS ${GDCM_BUILD_APPLICATIONS})
   if(BUILD_APPLICATIONS)
     subdirs(Applications)
