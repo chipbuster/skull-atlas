@@ -20,7 +20,7 @@
 set -euo pipefail
 
 # If either $1 or $2 is empty, give usage info
-if [ "$1" = ""  ] || [ "$2" = "" ] || [ "$1" = "-help" ] || [ "$1" = "--help" ]; then
+if [ "${1:-undef}" = "undef"  ] || [ "${2:-undef}" = "undef" ] || [ "$1" = "-help" ] || [ "$1" = "--help" ]; then
     echo "Usage: $0 <Box Sync Directory> <Working Directory>"
     echo ""
     echo "The Box directory should be the path to the Box \"Skull Atlas\""
@@ -28,6 +28,7 @@ if [ "$1" = ""  ] || [ "$2" = "" ] || [ "$1" = "-help" ] || [ "$1" = "--help" ];
     echo "The working directory should be somewhere where you have write"
     echo "permissions. The Box dir will be copied there before being extracted."
     echo ""
+    exit 0
 fi
 
 # If $3 shows up, the user might have word split a directory by accident:
