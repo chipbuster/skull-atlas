@@ -64,16 +64,8 @@ Runtime tests can be added by using the `add_test` command
 
 ### Components
 
-The files in `file_converters` provide methods for converting between different
-file formats. They should have individual README files (probably short) to
-describe how you use them. This structure is expected to remain stable.
+This section needs to be redone after the shifting around.
 
-The files in `data_processing` provide methods for processing data (e.g.
-meshing, extracting features, or registration). The structure of this folder is
-not entirely clear.
+### Notes on TravisCI
 
-The files in `cgal_dummy` are just to make sure that the build system (TravisCI)
-and CGAL are working as intended. The tests are pulled
-from [the latest CGAL introduction](http://doc.cgal.org/latest/Manual/introduction.html).
-This directory will probably be removed later if it is determined that it is no
-longer needed.
+Currently, TravisCI downloads and builds its own copy of CGAL, due to the version in Ubuntu being goddamn ancient. It still uses Ubuntu's system copies of Boost/MPFR/GMP for dependencies of CGAL.
