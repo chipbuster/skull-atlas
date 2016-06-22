@@ -20,7 +20,7 @@
 set -euo pipefail
 
 # Which directory is the script stored in?
-SCRIPTDIR="$(dirname "$(readlink -f "$0")")"
+export SCRIPTDIR="$(dirname "$(readlink -f "$0")")"
 
 # APPLICATIONS SECTION
 ###################################################################
@@ -35,13 +35,24 @@ esac
 # If GNU parallel is installed, use it. Otherwise use xargs.
 XARGS=xargs
 hash parallel 2>/dev/null && XARGS=parallel
+export XARGS
 
 # Grassroots DICOM converter: location may change
 CONVERT="$SCRIPTDIR/gdcm-2.6.3/build/bin/gdcmconv"
 hash $CONVERT 2>/dev/null || echo "The Grassroots DICOM converter was not found at $CONVERT"
+export CONVERT
+
+# Unzip and convert is in its own bash script
+UNZIP_AND_PROCESS="$SCRIPTDIR"/unzip_and_process
 
 ###################################################################
 # END APPLICATIONS SECTION
+
+
+###################
+## BEGIN PROGRAM ##
+###################
+
 
 # If either $1 or $2 is empty, give usage info
 if [ "${1:-undef}" = "undef"  ] || [ "${2:-undef}" = "undef" ] || [ "$1" = "-help" ] || [ "$1" = "--help" ]; then
@@ -99,6 +110,19 @@ if [ $IN_DIR_UNPACK = "NO" ]; then
     echo "Done!"
 fi
 
+
+#########################
+## DIRECTORY DIRECTORY ##
+#########################
+
+# On the first pass through the structure (the "unpacking loop"), we record the
+# directories with actual data in them. Later, this can be used to speed up the
+# search for other loops/programs.
+
+DIRDIR_FILE="$SCRIPTDIR/.datadirdir"
+rm -rf "$DIRDIR_FILE" #If script runs twice without cleaning, could place
+                      #same directory in here twice. Scrub to avoid that.
+
 # Remainder of script should take place within WORKDIR
 cd "$WORKDIR"
 
@@ -130,86 +154,23 @@ find $(pwd) -type d | while read DIR; do #Loop over all directories in pwd
         continue #Probably removed by the SynapseMediaSets culler, skip this directory
     fi
 
-    echo "Extracting images in $(pwd)"
-
-    find "$(pwd)" -maxdepth 1 -name '*.zip' | while read ZIPFILE; do #Loop over all zipfiles in each dir
-
-        NUMID=$(basename -s .zip "$ZIPFILE") #The number assigned to the patient.
-
-        unzip -o "$ZIPFILE" > /dev/null #-o forces overwrite if files already exist
-
-        ## We seek to organize the data into the structure described in the README.
-        # Once we unzip the zipfile, there are a few possibilities:
-
-        #  (1) We find a directory with the same NUMID as the zipfile. Great!
-        #      Move all of its contents into a temporary dir to create the structure.
-
-        if [ -d "$NUMID" ]; then
-            mkdir ./tempdir
-            mv "$NUMID" tempdir/DICOMOBJ
-            mv tempdir "$NUMID"
-        fi
-
-        # (2) We find a directory named DICOMOBJ. We can fix this by making the $NUMID
-        # directory and then moving the DICOMOBJ under it.
-
-        if [ -d "DICOMOBJ" ]; then
-            mkdir "$NUMID"
-            mv DICOMOBJ "$NUMID"
-        fi
-
-        # (3) We find a directory named SynapseMediaSets. This is trickier because
-        # the images are in a subdirectory below Syn201[ID]*, where [ID] is some numerical
-        # identifier dealing with when the data was accessed. We need to move the DICOMOBJ
-        # to up here and clean the remaining files (they are merely clutter to us)
-
-        if [ -d "SynapseMediaSets" ]; then
-
-            # We only expect Syn2016* to be in directory: if more than 1 file, this is unexpected
-            if [ $(ls -1 SynapseMediaSets | wc -l ) != "1" ]; then
-                echo "Error occured at $DIR: unexpected contents in SynapseMediaSets of $NUMID"
-                exit -1
-            fi
-
-            # Copy the appropriate DICOMOBJ to top-level if it exists
-            if [ -d SynapseMediaSets/Syn*/DICOMOBJ ]; then
-                mkdir "$NUMID"
-                mv SynapseMediaSets/Syn*/DICOMOBJ "$NUMID"
-            else
-                #Not good error reporting but I'm on a time budget here :(
-                echo "Could not find directory DICOMOBJ in SynapseMediaSets"
-                echo "Working in $DIR"
-                exit 1
-            fi
-
-            # Clean the rest up
-            rm -rf SynapseMediaSets
-        fi
-
-        # (4) Something else happened and none of the above triggered (currently unexpected)
-
-        if [ ! -d "$NUMID" ]; then
-            echo "Something unexpected happened during file processing"
-            echo "After unzipping the archive in $DIR"
-            echo "I'm seeing $(ls -l)"
-            echo ""
-            echo ""
-            echo "Please report the above error to the script writer.\n"
-            echo "###############"
-            echo "## Aborting! ##"
-            echo "###############"
-            exit 1
-        fi
-
-        # Now the DICOM images are in $NUMID/DICOMOBJ. Make the other two directories.
-        if [ -d "$NUMID/DICOMOBJ" ]; then
-          mkdir "$NUMID"/VOLIMG         # For volumetric images
-          mkdir "$NUMID"/METADATA       # For metadata dumps
-          mkdir "$NUMID"/DICOMUNC       # For uncompressed DICOM images
-        fi
-
-
+    # Check that zipfiles exist in this directory
+    for f in "$DIR"/*.zip; do
+        [ -e "$f" ] && ZIP_XIST=YES || ZIP_XIST=NO
+        break
     done
+
+    # If ZIPS exist, keep processing. Otherwise, skip this directory.
+    if [ "$ZIP_XIST" = NO ]; then
+        continue
+    else
+        echo "Extracting images in $DIR"
+    fi
+
+    # Loop over all the found .zip files and unzip/process them. This used to be in a loop,
+    # has been moved to parallel for faster work. unzip_and_process is a bash function.
+    find "$(pwd)" -maxdepth 1 -name '*.zip' -printf "%f\n" \
+        | "$XARGS" -d '\n' -P $NUMCPUS -I {} $UNZIP_AND_PROCESS {} \""${DIR}"\" \""$DIRDIR_FILE"\"
 done
 
 ########################
@@ -223,12 +184,15 @@ done
 
 cd "$WORKDIR"
 
+
+echo ""
+echo "#################################"
 echo "Preparing to convert compressed DICOM to RAW DICOM"
-echo "The error \"Could not read (pixmap)\" here most likely indicates"
-echo "corrupted or missing DICOM data."
+echo "The message \"Could not read (pixmap)\" here most likely "
+echo "indicates corrupted or missing DICOM data."
 echo ""
 
-find $(pwd) -type d | while read DIR; do #Loop over all directories in pwd
+cat "$DIRDIR_FILE" | while read DIR; do #Loop over all directories in pwd
 
     cd "$DIR"
 
@@ -246,13 +210,12 @@ find $(pwd) -type d | while read DIR; do #Loop over all directories in pwd
 
     echo "Decoding images for patient $NUMID"
 
-
     ## Allow pipe failures for this part of the script--some images are inherently corrupted
     set +o pipefail
 
     ## We should now be in a patient's directory. Use Xargs/parallel to convert images.
     cd "DICOMOBJ"
-    find . -maxdepth 1 -type f -printf "%f\n" | $XARGS -P $NUMCPUS -I {} "$CONVERT" -w {} ../DICOMUNC/{} || true
+    find . -maxdepth 1 -type f -printf "%f\n" | $XARGS -d '\n' -P $NUMCPUS -I {} "$CONVERT" -w {} ../DICOMUNC/{} || true
 
     set -o pipefail
 
