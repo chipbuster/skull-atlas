@@ -13,10 +13,9 @@ for i = N:-1:1
     data = dicomread(filename);
     info = dicominfo(filename);
     
-    if(isfield(info, 'SliceLocation') && isfield(info,'PixelSpacing')) 
-        zspace_new = info.SliceLocation;
-        zspacing = abs(zspace_init-zspace_new)/info.PixelSpacing(1,1);
-        zspace_init = zspace_new;
+    if(isfield(info, 'SliceThickness') && isfield(info,'PixelSpacing'))
+        zspace = info.SliceThickness;
+        zspacing = zspace/info.PixelSpacing(1,1);
     end
     %info.SliceThickness
     %info.SliceLocation
@@ -30,7 +29,6 @@ for i = N:-1:1
     if(isfield(info, 'InstanceNumber') && info.InstanceNumber==1)
         rawname = [int2str(k) tag '.rawiv'];
         writeRawIV(dataf,rawname,zspacing);
-        %samp = dataf;
         j = 0;
         k = k+1;
         dataf = zeros(X,Y,10);
