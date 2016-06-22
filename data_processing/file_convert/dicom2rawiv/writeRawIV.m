@@ -7,7 +7,7 @@
 %   Version:    1.0
 
 
-function writeRawIV(data,filename)
+function writeRawIV(data,filename, zspacing)
 
 fid = fopen(filename,'w');
 [X,Y,Z] = size(data); %could be flipped
@@ -18,7 +18,7 @@ minY = 1;
 minZ = 1;
 maxX = X;
 maxY = Y;
-maxZ = Z;
+maxZ = 1 + (Z-1)*zspacing;
 dimX = X;
 dimY = Y;
 dimZ = Z;
