@@ -9,6 +9,8 @@ def writeRawIV(data, filename, spacings):
 
     assert isinstance(data, np.ndarray), "Data is not a NumPy array!"
 
+    assert len(data.shape) == 3, "Data does not have 3 dimensions!"
+
     (X,Y,Z) = data.shape
     (xgap,ygap,zgap) = spacings
 
@@ -57,8 +59,15 @@ def writeRawIV(data, filename, spacings):
 
     assert len(header) == 68, "RawIV Header is wrong length, maybe this python platform uses nonstandard sizes?"
 
+    # Get flat view (not copy!) of data in column-major order as req'd
+    # by the rawiv standard.
+    flatdata = np.ravel(data, order='C')
+
     with open(filename, 'wb',) as outfile:
         outfile.write(header)
 
-        # Flatten data array and store it as uint
+        # Machine epsilon at 2**12 is ~ 4e-4, so store as floats
+        for elem in flatdata:
+            outfile.write(struct.pack('>f',elem))
 
+    return
