@@ -4,13 +4,20 @@ set -euo pipefail
 
 set -x
 
-ZIPFILE="$1"
-DIR="$2"
-DIRDIR_FILE="$3"
+
+# If using XARGS, we need to strip the quotes off of the names. If not using XARGS,
+# this is (probably) still safe
+
+
+ZIPFILE="$(echo "$1" | tr -d '"')"
+DIR="$(echo "$2" | tr -d '"')"
+DIRDIR_FILE="$(echo "$3" | tr -d '"')"
 
 NUMID=$(basename -s .zip "$ZIPFILE") #The number assigned to the patient.
 
-TMPDIR="${DIR}/""${NUMID}_TMP"
+echo "DIR IS $DIR"
+
+TMPDIR=$DIR/${NUMID}_TMP
 mkdir "$TMPDIR" # Create temporary working directory
 cd "$TMPDIR"
 
