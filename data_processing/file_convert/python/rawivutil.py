@@ -37,6 +37,8 @@ def writeRawIV(data, filename, spacings):
 
     header = bytearray()
 
+    assert numVerts == data.size, "Something wrong with image dimension calculations"
+
     # Pack the header info into a bytearray
 
     header.extend(struct.pack('>f',minX))  #Big-endian float
@@ -59,15 +61,13 @@ def writeRawIV(data, filename, spacings):
 
     assert len(header) == 68, "RawIV Header is wrong length, maybe this python platform uses nonstandard sizes?"
 
-    # Get flat view (not copy!) of data in column-major order as req'd
-    # by the rawiv standard.
-    flatdata = np.ravel(data, order='C')
-
     with open(filename, 'wb',) as outfile:
         outfile.write(header)
 
         # Machine epsilon at 2**12 is ~ 4e-4, so store as floats
-        for elem in flatdata:
-            outfile.write(struct.pack('>f',elem))
+        for z in range(dimZ):
+            for y in range(dimY):
+                for x in range(dimX):
+                    outfile.write(struct.pack('>f',data[x,y,z]))
 
     return

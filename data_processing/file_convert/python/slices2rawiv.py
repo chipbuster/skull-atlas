@@ -6,6 +6,29 @@ import sys
 import os
 from rawivutil import *
 from dicomutil import *
+from collections import defaultdict
+
+def read_all_dicom_in_dirpath(path):
+    """Reads all the dicom images in a path into a set"""
+
+    all_dicom = list()
+
+    for fname in os.listdir(path):
+        all_dicom.append(dicom.read_file(os.path.join(path,fname)))
+
+    return all_dicom
+
+def sep_into_bins(slices):
+    """Given a group of DICOM slices, separate out into sets of DICOM images
+    partitioned by the SeriesInstanceUID"""
+
+    buckets = defaultdict(list)
+
+    for img in slices:
+        siuid = img.SeriesInstanceUID
+        buckets[siuid].append(img)
+
+    return buckets
 
 def make_one_volimage(slices):
     """Takes a set of PyDICOM DataSet objects (returned by dicom.read_file) and
@@ -21,7 +44,7 @@ def make_one_volimage(slices):
 
     image_as_list = sort_slices(slices, changing_dimension)
 
-    for (z_index, image) in image_as_list:
+    for z_index, image in enumerate(image_as_list):
         vol_image[:,:,z_index] = image.pixel_array
 
     return (vol_image, (xspace,yspace,zspace))
@@ -29,10 +52,10 @@ def make_one_volimage(slices):
 def get_sort_coordinate(slice,ddim):
     """Gets the value to sort a slice by, given the changing coordinate"""
 
-    return slice.PatientImagePosition[ddim]
+    return slice.ImagePositionPatient[ddim]
 
 def sort_slices(slices,ddim):
-    """Sorts slices based on the ddim value of PatientImagePosition, in increasing order"""
+    """Sorts slices based on the ddim value of ImagePositionPatient, in increasing order"""
 
     list_of_slices = list(slices)
 
@@ -52,7 +75,7 @@ def get_dims(slices):
 
 def get_spacing(slices):
     """Given a set of slices, gets spacings between x,y,z for reconstructed
-    volumetric image. Also returns the changing dimension in the PatientImagePosition
+    volumetric image. Also returns the changing dimension in the ImagePositionPatient
     (0 = x, 1 = y, 2 = z)"""
 
 
@@ -64,13 +87,13 @@ def get_spacing(slices):
     list_of_slices = list(slices)
 
     # Get two testing slices to determine which coordinate varies
-    test_ds1 = list_of_slices[0]
-    test_ds2 = list_of_slices[1]
+    test_ds1 = list_of_slices[-1]
+    test_ds2 = list_of_slices[-2]
 
     # Test slice difference
-    dx = abs(test_ds1.PatientImagePosition[0] - test_ds2.PatientImagePosition[0])
-    dy = abs(test_ds1.PatientImagePosition[1] - test_ds2.PatientImagePosition[1])
-    dz = abs(test_ds1.PatientImagePosition[2] - test_ds2.PatientImagePosition[2])
+    dx = abs(test_ds1.ImagePositionPatient[0] - test_ds2.ImagePositionPatient[0])
+    dy = abs(test_ds1.ImagePositionPatient[1] - test_ds2.ImagePositionPatient[1])
+    dz = abs(test_ds1.ImagePositionPatient[2] - test_ds2.ImagePositionPatient[2])
 
     # Set the inter-image delta and the intra-image deltas
     if dx > dy and dx > dz:
@@ -94,7 +117,7 @@ def get_spacing(slices):
     #     ts1 = list_of_slices[i]
     #     ts2 = list_of_slices[i+1]
 
-    #     diffZ = abs(ts1.PatientImagePosition[ddim] - ts2.PatientImagePosition[ddim])
+    #     diffZ = abs(ts1.ImagePositionPatient[ddim] - ts2.ImagePositionPatient[ddim])
     #     diffX = abs(ts1.PixelSpacing[0] - ts2.PixelSpacing[0])
     #     diffY = abs(ts1.PixelSpacing[1] - ts2.PixelSpacing[1])
 
