@@ -21,13 +21,12 @@ def main(filepath):
                 ds = dicom.read_file(target)
 
                 if 'ImageOrientationPatient' in ds:
-                    continue
-                else:
-                    # Find patient name and report
-                    pc = dirpath.split('/')
-                    patient_id = pc[-2]
-
-                    print("File " + fname + " for Patient " + patient_id + " does not have any position info.")
+                    o = ds.ImageOrientationPatient
+                    for v in o:
+                        if abs(v) > 0.1 and abs(abs(v) - 1) > 0.1:
+                            pc = dirpath.split('/')
+                            patient_id = pc[-2]
+                            print("File " + fname + " for Patient " + patient_id + " has wonky orientation data: " +str(o))
 
 if __name__ == "__main__":
     main(sys.argv[1])
