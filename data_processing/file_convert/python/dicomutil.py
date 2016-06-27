@@ -4,7 +4,7 @@ import numpy as np
 import dicom
 import sys
 
-def get_dicom_image(ds_open_file):
+def get_image(ds_open_file):
     """Returns a numpy array containing the actual image data of the image,
     in ascending monochrome (high = white), known in DICOM as MONOCHROME2"""
 
@@ -62,7 +62,7 @@ def get_dicom_image(ds_open_file):
                          +'but its PhotometricInterpretation value is: ' + pminterp
                          +'which I do not understand.')
 
-def get_dicom_metadata(ds_open_file):
+def get_metadata(ds_open_file):
     """Retrieves DICOM file metadata, dumping the image data and overlays."""
 
     ds = ds_open_file
@@ -74,6 +74,41 @@ def get_dicom_metadata(ds_open_file):
         del ds[tag]   #Nuk'd
 
     return ds
+
+def img_coord_to_rcs(ds_open_file):
+    """Returns a matrix indicating how to transform image coordinates into RCS (body)
+    coordinates."""
+
+    fudge = 1e-4 #If anything is less than this away from 0/1, round
+
+    coords = ds_open_file.ImageOrientationPatient
+
+    only_ones = True
+
+    # Round close coordinates to 0 or \pm 1
+    for val in coords:
+        if abs(val) < fudge:
+            val = 0
+        elif abs(val) - 1 < fudge:
+            val =  ((val > 0) - (val < 0)) * 1 #+1 or -1 depending on sign
+
+        if val != 0 and val != 1:
+            only_ones = False
+
+
+    if only_ones == False:
+        print(coords)
+        raise ValueError("Non-right-angle rotations in DICOM image. Aborting...")
+
+    # Construct matrix for transformation
+    x_trans = np.array(coords[0:2])
+    y_trans = np.array(coords[3:5])
+    z_trans = np.cross(x_trans, y_trans)
+
+    # Not technically a permutation matrix since it can have -1 entries
+    permut_mat = np.transpose(np.matrix(np.vstack((x_trans,y_trans,z_trans))))
+
+    return permut_mat
 
 def get_dicom_file(filename):
     return dicom.read_file(filename)

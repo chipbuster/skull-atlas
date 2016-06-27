@@ -186,11 +186,11 @@ cd "$WORKDIR"
 
 
 echo ""
-echo "#################################"
-echo "Preparing to convert compressed DICOM to RAW DICOM"
-echo "The message \"Could not read (pixmap)\" here most likely "
-echo "indicates corrupted or missing DICOM data."
-echo ""
+echo "######################################################"
+echo "# Preparing to convert compressed DICOM to RAW DICOM #"
+echo "# The message \"Could not read (pixmap)\" here most    #"
+echo "# likely indicates corrupted or missing DICOM data.  #"
+echo "######################################################"
 
 cat "$DIRDIR_FILE" | while read DIR; do #Loop over all directories in pwd
 

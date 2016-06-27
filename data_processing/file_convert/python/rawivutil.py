@@ -14,6 +14,10 @@ def writeRawIV(data, filename, spacings):
     (X,Y,Z) = data.shape
     (xgap,ygap,zgap) = spacings
 
+    print("Writing rawiv " + filename + " to file.")
+    print("Size is " + str(data.shape))
+    print("Spacings are " + str(spacings))
+
     ## Set up header information for rawiv files
     ## See https://svn.ices.utexas.edu/repos/cvc/trunk/VolumeRoverDoc/RoverManual.pdf for more info
 
@@ -64,10 +68,9 @@ def writeRawIV(data, filename, spacings):
     with open(filename, 'wb',) as outfile:
         outfile.write(header)
 
-        # Machine epsilon at 2**12 is ~ 4e-4, so store as floats
-        for z in range(dimZ):
-            for y in range(dimY):
-                for x in range(dimX):
-                    outfile.write(struct.pack('>f',data[x,y,z]))
+        flatdata = data.ravel(order='F')
+
+        packed = struct.pack('>' + 'f' * data.size, *flatdata)
+        outfile.write(packed)
 
     return
