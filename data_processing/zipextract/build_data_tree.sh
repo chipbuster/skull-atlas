@@ -38,21 +38,19 @@ hash parallel 2>/dev/null && XARGS=parallel
 export XARGS
 
 # Grassroots DICOM converter: location may change
-CONVERT="$SCRIPTDIR/gdcm-2.6.3/build/bin/gdcmconv"
+CONVERT="$SCRIPTDIR/gdcmconv"
 hash $CONVERT 2>/dev/null || echo "The Grassroots DICOM converter was not found at $CONVERT"
 export CONVERT
 
 # Unzip and convert is in its own bash script
-UNZIP_AND_PROCESS="$SCRIPTDIR"/unzip_and_process
+UNZIP_AND_PROCESS="$SCRIPTDIR/unzip_and_process"
 
 ###################################################################
 # END APPLICATIONS SECTION
 
-
 ###################
 ## BEGIN PROGRAM ##
 ###################
-
 
 # If either $1 or $2 is empty, give usage info
 if [ "${1:-undef}" = "undef"  ] || [ "${2:-undef}" = "undef" ] || [ "$1" = "-help" ] || [ "$1" = "--help" ]; then
@@ -121,7 +119,7 @@ LINKDIR="$(dirname "$WORKDIR")/patient_links"
 # directories with actual data in them. Later, this can be used to speed up the
 # search for other loops/programs.
 
-DIRDIR_FILE="$SCRIPTDIR/.datadirdir"
+DIRDIR_FILE="/tmp/.datadirdir"
 rm -rf "$DIRDIR_FILE" #If script runs twice without cleaning, could place
                       #same directory in here twice. Scrub to avoid that.
 

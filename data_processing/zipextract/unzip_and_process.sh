@@ -18,7 +18,7 @@ cd "$TMPDIR"
 
 FOUND_FILES="false"
 
-unzip -o "$DIR/$ZIPFILE" > /dev/null #-o forces overwrite if files already exist
+unzip -o "$DIR/$(basename "$ZIPFILE")" > /dev/null #-o forces overwrite if files already exist
 
 function looks_like_dicom(){
     NUM_FILES=$(find "$1" -maxdepth 1 -name '[0-9]*' | wc -l)
