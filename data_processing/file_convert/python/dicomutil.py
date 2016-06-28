@@ -110,10 +110,12 @@ def get_value(dicoms,valstring):
     return None
 
 def get_series_metadata(series):
+    """Given a collection of DICOM DataSets that form a series,
+    retrieves interesting series metadata"""
     smetadata = dict()
 
     data_names = ['SeriesDate', 'SeriesTime', 'SeriesDescription', 'SliceThickness', 'KVP',
-                  'PhotometricInterpretation' ]
+                  'PhotometricInterpretation', 'ImageOrientationPatient' ]
 
     for data_name in data_names:
         smetadata[data_name] = get_value(series, data_name)
@@ -126,13 +128,15 @@ def get_series_metadata(series):
     return smetadata
 
 def get_study_metadata(study):
+    """Given a collection of DICOM DataSets that form a study,
+    retrieves interesting study metadata"""
     smetadata = dict()
 
     data_names = ['StudyDate', 'StudyTime', 'StudyDescription', 'PatientAge', 'PatientBirthDate',
                   'PatientID', 'PatientSex']
 
     for data_name in data_names:
-        smetadata[data_name] = get_value(series, data_name)
+        smetadata[data_name] = get_value(study, data_name)
 
     return smetadata
 

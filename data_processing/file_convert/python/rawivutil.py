@@ -14,9 +14,10 @@ def writeRawIV(data, filename, spacings):
     (X,Y,Z) = data.shape
     (xgap,ygap,zgap) = spacings
 
-    print("Writing rawiv " + filename + " to file.")
-    print("Size is " + str(data.shape))
-    print("Spacings are " + str(spacings))
+    # Debugging statements
+#    print("Writing rawiv " + filename + " to file.")
+#    print("Size is " + str(data.shape))
+#    print("Spacings are " + str(spacings))
 
     ## Set up header information for rawiv files
     ## See https://svn.ices.utexas.edu/repos/cvc/trunk/VolumeRoverDoc/RoverManual.pdf for more info
@@ -45,23 +46,28 @@ def writeRawIV(data, filename, spacings):
 
     # Pack the header info into a bytearray
 
-    header.extend(struct.pack('>f',minX))  #Big-endian float
-    header.extend(struct.pack('>f',minY))
-    header.extend(struct.pack('>f',minZ))
-    header.extend(struct.pack('>f',maxX))
-    header.extend(struct.pack('>f',maxY))
-    header.extend(struct.pack('>f',maxZ))
-    header.extend(struct.pack('>I',numVerts)) #Big-endian uint32
-    header.extend(struct.pack('>I',numCells))
-    header.extend(struct.pack('>I',dimX))
-    header.extend(struct.pack('>I',dimY))
-    header.extend(struct.pack('>I',dimZ))
-    header.extend(struct.pack('>f',originX))  #Big-endian float
-    header.extend(struct.pack('>f',originY))
-    header.extend(struct.pack('>f',originZ))
-    header.extend(struct.pack('>f',spanX))
-    header.extend(struct.pack('>f',spanY))
-    header.extend(struct.pack('>f',spanZ))
+
+    floatpacker = struct.Struct('>f')
+    intpacker = struct.Struct('>I')
+    arrpacker = struct.Struct('>%df' % data.size)
+
+    header.extend(floatpacker.pack(minX))  #Big-endian float
+    header.extend(floatpacker.pack(minY))
+    header.extend(floatpacker.pack(minZ))
+    header.extend(floatpacker.pack(maxX))
+    header.extend(floatpacker.pack(maxY))
+    header.extend(floatpacker.pack(maxZ))
+    header.extend(intpacker.pack(numVerts)) #Big-endian uint32
+    header.extend(intpacker.pack(numCells))
+    header.extend(intpacker.pack(dimX))
+    header.extend(intpacker.pack(dimY))
+    header.extend(intpacker.pack(dimZ))
+    header.extend(floatpacker.pack(originX))  #Big-endian float
+    header.extend(floatpacker.pack(originY))
+    header.extend(floatpacker.pack(originZ))
+    header.extend(floatpacker.pack(spanX))
+    header.extend(floatpacker.pack(spanY))
+    header.extend(floatpacker.pack(spanZ))
 
     assert len(header) == 68, "RawIV Header is wrong length, maybe this python platform uses nonstandard sizes?"
 
@@ -70,7 +76,11 @@ def writeRawIV(data, filename, spacings):
 
         flatdata = data.ravel(order='F')
 
-        packed = struct.pack('>' + 'f' * data.size, *flatdata)
+        packed = arrpacker.pack(*flatdata)
         outfile.write(packed)
+
+    del floatpacker
+    del intpacker
+    del arrpacker
 
     return
