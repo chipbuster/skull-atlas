@@ -199,7 +199,9 @@ cat "$DIRDIR_FILE" | while read DIR; do #Loop over all directories in pwd
 
     cd "$DIR"
 
-    ln -s "$DIR" "$LINKDIR"
+    if [ ! -e "$LINKDIR/$(basename "$DIR")" ]; then
+        ln -s "$DIR" "$LINKDIR"
+    fi
 
     if [ ! -d "DICOMOBJ" ]; then
         continue # We are not needed here.

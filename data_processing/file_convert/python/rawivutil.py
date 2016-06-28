@@ -44,13 +44,14 @@ def writeRawIV(data, filename, spacings):
 
     assert numVerts == data.size, "Something wrong with image dimension calculations"
 
-    # Pack the header info into a bytearray
-
-
+    # If we don't create Struct objects, the struct module leaks memory
+    # (Not technically a leak, but it behaves just like one)
     floatpacker = struct.Struct('>f')
     intpacker = struct.Struct('>I')
     arrpacker = struct.Struct('>%df' % data.size)
 
+
+    # Pack the header info into a bytearray
     header.extend(floatpacker.pack(minX))  #Big-endian float
     header.extend(floatpacker.pack(minY))
     header.extend(floatpacker.pack(minZ))

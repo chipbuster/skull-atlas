@@ -66,9 +66,8 @@ def patient_dicom_to_rawiv(inp_tuple):
 
         # Gather interesting metadata on this file
         series_mdata = dicomutil.get_series_metadata(series)
-        series_mdata['PatientID'] = patient_id
+        series_mdata['PatientID'] = patient_id #Overwrite this field -- different from our IDs
 
-        # If there is a series description, use it to name the file
         series_name = "series_%d" % counter
         counter += 1
 
