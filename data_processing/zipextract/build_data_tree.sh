@@ -20,7 +20,7 @@
 set -euo pipefail
 
 # Which directory is the script stored in?
-export SCRIPTDIR="$(dirname "$(readlink -f "$0")")"
+export SCRIPTDIR="$(dirname "$(realpath "$0")")"
 
 # APPLICATIONS SECTION
 ###################################################################
@@ -99,7 +99,7 @@ if [ "$1" = "--force" ]; then
 
 else
     BOXDIR="$1"
-    WORKDIR="$(readlink -f "$2")"
+    WORKDIR="$(realpath "$2")"
 fi
 
 # If not forcing an in-place unpacking, copy Box data to working dir
