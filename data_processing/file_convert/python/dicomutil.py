@@ -62,19 +62,6 @@ def get_image(ds_open_file):
                          +'but its PhotometricInterpretation value is: ' + pminterp
                          +'which I do not understand.')
 
-def get_metadata(ds_open_file):
-    """Retrieves DICOM file metadata, dumping the image data and overlays."""
-
-    ds = ds_open_file
-    del ds[0x7fe0,0x10] # The pixel data
-
-    # Find all the keys that lead with 0x6000, using the fact that tags are derived from long
-    overlay_tags = [ x for x in ds.keys() if x > 0x60000000 and x < 0x60ffffff ]
-    for tag in overlay_tags:
-        del ds[tag]   #Nuk'd
-
-    return ds
-
 def img_coord_to_rcs(ds_open_file):
     """Returns a matrix indicating how to transform image coordinates into RCS (body)
     coordinates."""
@@ -109,6 +96,45 @@ def img_coord_to_rcs(ds_open_file):
     permut_mat = np.transpose(np.matrix(np.vstack((x_trans,y_trans,z_trans))))
 
     return permut_mat
+
+def get_value(dicoms,valstring):
+    """Given a set of DICOM images, searches for valstring in the DICOM data.
+    Returns the first found value among dicoms."""
+
+    for dicom in dicoms:
+        if valstring in dicom:
+            return dicom.data_element(valstring).value
+
+    # Didn't find it
+    print("Could not find tag " + valstring)
+    return None
+
+def get_series_metadata(series):
+    smetadata = dict()
+
+    data_names = ['SeriesDate', 'SeriesTime', 'SeriesDescription', 'SliceThickness', 'KVP',
+                  'PhotometricInterpretation' ]
+
+    for data_name in data_names:
+        smetadata[data_name] = get_value(series, data_name)
+
+    # Add dimensions
+    smetadata['x_ct'] = get_value(series,'Rows')
+    smetadata['y_ct'] = get_value(series,'Columns')
+    smetadata['z_ct'] = len(series)
+
+    return smetadata
+
+def get_study_metadata(study):
+    smetadata = dict()
+
+    data_names = ['StudyDate', 'StudyTime', 'StudyDescription', 'PatientAge', 'PatientBirthDate',
+                  'PatientID', 'PatientSex']
+
+    for data_name in data_names:
+        smetadata[data_name] = get_value(series, data_name)
+
+    return smetadata
 
 def get_dicom_file(filename):
     return dicom.read_file(filename)
