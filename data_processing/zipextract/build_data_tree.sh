@@ -171,7 +171,7 @@ find $(pwd) -type d | while read DIR; do #Loop over all directories in pwd
 
     # Loop over all the found .zip files and unzip/process them. This used to be in a loop,
     # has been moved to parallel for faster work. unzip_and_process is a bash function.
-    find "$(pwd)" -maxdepth 1 -name '*.zip' -printf "%f\n" \
+    find "$(pwd)" -maxdepth 1 -name '*.zip' -print \
         | "$XARGS" -d '\n' -P $NUMCPUS -I {} $UNZIP_AND_PROCESS {} \""${DIR}"\" \""$DIRDIR_FILE"\"
 done
 

@@ -22,4 +22,6 @@ The target directory structure is as follows:
 Prerequisites are:
     * A C/C++/Fortran compiler
     * Python 3
+    * PyDICOM
+    * Numpy
     * CMake
