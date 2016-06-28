@@ -1,0 +1,2 @@
+/usr/bin/ar qc ../../../bin/libgdcmexpat.a  CMakeFiles/gdcmexpat.dir/xmlparse.c.o CMakeFiles/gdcmexpat.dir/xmltok.c.o CMakeFiles/gdcmexpat.dir/xmlrole.c.o
+/usr/bin/ranlib ../../../bin/libgdcmexpat.a
