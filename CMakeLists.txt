@@ -16,5 +16,5 @@ endif(BUILD_CGAL_MESH_GEN)
 
 option(BUILD_DICOM_PIPELINE "Builds the pipeline to take raw DICOM images to rawiv files + metadata" ON)
 if(BUILD_DICOM_PIPELINE)
-  add_subdirectory(data_processing)
+  add_subdirectory(dicom2rawiv)
 endif(BUILD_DICOM_PIPELINE)
