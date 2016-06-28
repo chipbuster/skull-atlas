@@ -36,13 +36,16 @@ import multiprocessing
 from slices2rawiv import *
 
 def patient_dicom_to_rawiv(inp_tuple):
+    # Input comes as a tuple for easier compat with multiprocessing
+    # Need to unpack this tuple before proceeding
     (path,patient_id) = inp_tuple
 
+    # Set up directories for later
     dicom_dir = os.path.join(path,'DICOMUNC')
     rawiv_dir = os.path.join(path,'VOLIMG')
     mdata_dir = os.path.join(path,'METADATA')
-    all_dicoms = read_all_dicom_in_dirpath(dicom_dir)
 
+    all_dicoms = read_all_dicom_in_dirpath(dicom_dir)
     binned_dicoms = list(sep_into_bins(all_dicoms).values())
 
     counter = 1
@@ -58,18 +61,21 @@ def patient_dicom_to_rawiv(inp_tuple):
         json.dump(study_mdata,outfile)
 
     for series in binned_dicoms:
+        # If the series is small, ignore it--probably close-ups or too coarse
         if len(series) < 100:
             for s in series:
                 del s
             del series
-            continue #This DICOM is too short to produce good data
+            continue
 
-        # Gather interesting metadata on this file
-        series_mdata = dicomutil.get_series_metadata(series)
-        series_mdata['PatientID'] = patient_id #Overwrite this field -- different from our IDs
-
+        # Give this series an identifier
         series_name = "series_%d" % counter
         counter += 1
+
+        # Gather interesting metadata on this series
+        series_mdata = dicomutil.get_series_metadata(series)
+        series_mdata['PatientID'] = patient_id #Overwrite this field -- different from our IDs
+        series_mdata['CVCSeriesId'] = series_name
 
         volfile_name = series_name + ".rawiv"
         mdtfile_name = series_name + ".json"
@@ -77,6 +83,7 @@ def patient_dicom_to_rawiv(inp_tuple):
         vol_out = os.path.join(rawiv_dir, volfile_name)
         mdt_out = os.path.join(mdata_dir, mdtfile_name)
 
+        # Make a numpy array out of the slices
         try:
             (img, (xs,ys,zs)) = make_one_volimage_with_spacings(series)
         except ValueError as verror:

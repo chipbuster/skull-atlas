@@ -14,11 +14,6 @@ def writeRawIV(data, filename, spacings):
     (X,Y,Z) = data.shape
     (xgap,ygap,zgap) = spacings
 
-    # Debugging statements
-#    print("Writing rawiv " + filename + " to file.")
-#    print("Size is " + str(data.shape))
-#    print("Spacings are " + str(spacings))
-
     ## Set up header information for rawiv files
     ## See https://svn.ices.utexas.edu/repos/cvc/trunk/VolumeRoverDoc/RoverManual.pdf for more info
 
@@ -50,7 +45,6 @@ def writeRawIV(data, filename, spacings):
     intpacker = struct.Struct('>I')
     arrpacker = struct.Struct('>%df' % data.size)
 
-
     # Pack the header info into a bytearray
     header.extend(floatpacker.pack(minX))  #Big-endian float
     header.extend(floatpacker.pack(minY))
@@ -75,9 +69,9 @@ def writeRawIV(data, filename, spacings):
     with open(filename, 'wb',) as outfile:
         outfile.write(header)
 
-        flatdata = data.ravel(order='F')
+        flatdata = data.ravel(order='F') #Column-major 1-D view of array
 
-        packed = arrpacker.pack(*flatdata)
+        packed = arrpacker.pack(*flatdata) #Pack whole array at once (faster!)
         outfile.write(packed)
 
     del floatpacker

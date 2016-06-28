@@ -62,6 +62,56 @@ def get_image(ds_open_file):
                          +'but its PhotometricInterpretation value is: ' + pminterp
                          +'which I do not understand.')
 
+
+def get_value(dicoms,valstring):
+    """Given a set of DICOM images, searches for valstring in the DICOM data.
+    Returns the first found value among dicoms."""
+
+    for dicom in dicoms:
+        if valstring in dicom:
+            return dicom.data_element(valstring).value
+
+    # Didn't find it
+    print("Could not find tag " + valstring)
+    return None
+
+def get_series_metadata(series):
+    """Given a collection of DICOM DataSets that form a series,
+    retrieves interesting series metadata"""
+    smetadata = dict()
+
+    data_names = ['SeriesDate', 'SeriesTime', 'SeriesDescription', 'SliceThickness', 'KVP',
+                  'PhotometricInterpretation', 'ImageOrientationPatient' ]
+
+    for data_name in data_names:
+        smetadata[data_name] = get_value(series, data_name)
+
+    # Add dimensions of series
+    smetadata['x_ct'] = get_value(series,'Rows')
+    smetadata['y_ct'] = get_value(series,'Columns')
+    smetadata['z_ct'] = len(series)
+
+    return smetadata
+
+def get_study_metadata(study):
+    """Given a collection of DICOM DataSets that form a study,
+    retrieves interesting study metadata"""
+    smetadata = dict()
+
+    data_names = ['StudyDate', 'StudyTime', 'StudyDescription', 'PatientAge', 'PatientBirthDate',
+                  'PatientID', 'PatientSex']
+
+    for data_name in data_names:
+        smetadata[data_name] = get_value(study, data_name)
+
+    return smetadata
+
+def get_dicom_file(filename):
+    return dicom.read_file(filename)
+
+##################################################
+## This function is currently unused and untested
+##################################################
 def img_coord_to_rcs(ds_open_file):
     """Returns a matrix indicating how to transform image coordinates into RCS (body)
     coordinates."""
@@ -97,48 +147,3 @@ def img_coord_to_rcs(ds_open_file):
 
     return permut_mat
 
-def get_value(dicoms,valstring):
-    """Given a set of DICOM images, searches for valstring in the DICOM data.
-    Returns the first found value among dicoms."""
-
-    for dicom in dicoms:
-        if valstring in dicom:
-            return dicom.data_element(valstring).value
-
-    # Didn't find it
-    print("Could not find tag " + valstring)
-    return None
-
-def get_series_metadata(series):
-    """Given a collection of DICOM DataSets that form a series,
-    retrieves interesting series metadata"""
-    smetadata = dict()
-
-    data_names = ['SeriesDate', 'SeriesTime', 'SeriesDescription', 'SliceThickness', 'KVP',
-                  'PhotometricInterpretation', 'ImageOrientationPatient' ]
-
-    for data_name in data_names:
-        smetadata[data_name] = get_value(series, data_name)
-
-    # Add dimensions
-    smetadata['x_ct'] = get_value(series,'Rows')
-    smetadata['y_ct'] = get_value(series,'Columns')
-    smetadata['z_ct'] = len(series)
-
-    return smetadata
-
-def get_study_metadata(study):
-    """Given a collection of DICOM DataSets that form a study,
-    retrieves interesting study metadata"""
-    smetadata = dict()
-
-    data_names = ['StudyDate', 'StudyTime', 'StudyDescription', 'PatientAge', 'PatientBirthDate',
-                  'PatientID', 'PatientSex']
-
-    for data_name in data_names:
-        smetadata[data_name] = get_value(study, data_name)
-
-    return smetadata
-
-def get_dicom_file(filename):
-    return dicom.read_file(filename)

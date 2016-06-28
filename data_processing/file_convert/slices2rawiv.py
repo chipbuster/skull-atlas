@@ -76,12 +76,12 @@ def get_dims(slices):
 
     return (x_count,y_count,z_count)
 
+# this function is a bit...confusing, given its history
 def get_spacing(slices):
     """Given a set of slices, gets spacings between x,y,z for reconstructed
     volumetric image. This is returned as a numpy matrix, column format.
     Also returns the changing dimension in the ImagePositionPatient
     (0 = x, 1 = y, 2 = z)"""
-
 
     ## Note: This function works in image coordinates, i.e. X is the spacing between
     # left-right pixels, Y is the spacing between top-bottom pixels, and
