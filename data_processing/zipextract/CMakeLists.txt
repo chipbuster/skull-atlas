@@ -11,3 +11,13 @@ install(PROGRAMS find_invalid_dicom.py DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECT
   RENAME find_invalid_dicom)
 install(PROGRAMS find_nonorthogonal_dicom.py DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
   RENAME find_nonorthogonal_dicom)
+
+# Also install to install location
+install(PROGRAMS build_data_tree.sh DESTINATION bin
+  RENAME build_data_tree)
+install(PROGRAMS unzip_and_process.sh DESTINATION bin
+  RENAME unzip_and_process)
+install(PROGRAMS find_invalid_dicom.py DESTINATION bin
+  RENAME find_invalid_dicom)
+install(PROGRAMS find_nonorthogonal_dicom.py DESTINATION bin
+  RENAME find_nonorthogonal_dicom)
