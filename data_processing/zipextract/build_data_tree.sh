@@ -110,6 +110,8 @@ if [ $IN_DIR_UNPACK = "NO" ]; then
     echo "Done!"
 fi
 
+# Set up a directory to hold softlinks to patients in tree
+LINKDIR="$(dirname "$WORKDIR")/patient_links"
 
 #########################
 ## DIRECTORY DIRECTORY ##
@@ -184,7 +186,6 @@ done
 
 cd "$WORKDIR"
 
-
 echo ""
 echo "######################################################"
 echo "# Preparing to convert compressed DICOM to RAW DICOM #"
@@ -192,9 +193,13 @@ echo "# The message \"Could not read (pixmap)\" here most    #"
 echo "# likely indicates corrupted or missing DICOM data.  #"
 echo "######################################################"
 
+mkdir "$LINKDIR"
+
 cat "$DIRDIR_FILE" | while read DIR; do #Loop over all directories in pwd
 
     cd "$DIR"
+
+    ln -s "$DIR" "$LINKDIR"
 
     if [ ! -d "DICOMOBJ" ]; then
         continue # We are not needed here.
