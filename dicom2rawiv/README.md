@@ -31,6 +31,14 @@ Prerequisites are:
  * PyDICOM
  * Numpy
  * CMake
+
+## Quick Start
+ 0. Install PyDICOM and Numpy using your mechanism of choice.
+ 1. Download the Skull Atlas directory from Box. Unzip it (if using the web interface) or make sure it's synced to your computer (if using Box Sync).
+ 2. Make a directory where you'd like to install things. Run `cmake <path_to_source> -DCMAKE_INSTALL_PREFIX=</path/to/installdir>`. Make sure that `path_to_source` is the top level of this git repository (should be named skull-atlas if you didn't change it).
+ 3. Run `make`, then `make install`
+ 4. Run `</path/to/installdir>/bin/build_data_tree <Box Dir> <Data Dir>` where `<Data Dir>` is where you want the data to install.
+ 5. Run `</path/to/installdir>/bin/convert_all <Data Dir>`.
     
 ## Install Instructions for ICES CentOS 7
 
@@ -53,6 +61,8 @@ Once you've decided on a prefix, make a build directory, `cd` into it, and run
 
 `cmake <path-to-source> -DCMAKE_INSTALL_PREFIX=<path-to-prefix>`
 
+Note that the `path-to-source` must be the top-level directory of the skull-atlas code.
+
 Then run `make` and `make install`.
 
 If all has gone well, you'll have a directory with a `bin`/`lib`/`include`/`share` 
@@ -66,27 +76,26 @@ over 2GB per patient.
 There are two steps to getting data: unpacking the zipfiles and generating 
 rawiv from DICOM.
 
-The first step is done with the `build_data_tree` script. It assumes that you
-have the Skull Atlas Box directory on your filesystem. If you do not, download
-the directory from Box and unzip the resulting zip to get the same effect.
+#### Unpack ZIP
 
-If you are syncing from Box, we don't want to pollute the original directory,
-so find a directory you want to do the work in. Then run
+Unpacking the zipfiles is done with the `build_data_tree` script.
 
-`build_data_tree <Box Directory> <work directory>`
+The format for this script is:
 
-(Unless you've changed the name, the Box Directory should almost certainly
-be named "Skull Atlas". Make sure you escape the space somehow.)
+```
+build_data_tree source_dir work_dir
+```
 
-This will generate a working tree in `<work directory>` with uncompressed
-DICOM images and the structure mentioned in the `README.md` in zipextract.
+This first copies the tree in `source_dir` to `work_dir`, to avoid potentially pollution the source data. It then traverses the file tree rooted at `work_dir`, and attempts to unzip every `.zip` file in that tree. For every ZIP it encounters, it creates four subfolders, described in the zipextract/README.md.
 
-This will also generate a directory called `patient_links`. It is a flat
-structure which allows you to easily access patient data without having
-to trawl through a tree structure.
+It also creates a directory named patient_links in the same directory as `work_dir` (that is, in `$(dirname work_dir)`). These allow you to rapidly view the patients instead of traversing the directory tree.
+
+To emphasize: while the quick start shows you how to process the entire Box directory at once, the only requirement for `source_dir` are that it is a directory with .zip files representing DICOM data somewhere below it in the file system tree.
 
 (Warnings about unable to read pixmap can be ignore unless there's over 10
 of them for a single patient.)
+
+#### Make RAWIV
 
 The second step (rawiv generation) is accomplished with the `convert_all` script.
 Simply pass it the work directory (the second argument to `build_data_tree`)
