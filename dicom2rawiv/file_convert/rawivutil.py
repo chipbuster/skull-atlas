@@ -20,9 +20,9 @@ def writeRawIV(data, filename, spacings):
     minX = 1.0
     minY = 1.0
     minZ = 1.0
-    maxX = X * xgap + minX
-    maxY = Y * ygap + minY
-    maxZ = Z * zgap + minZ
+    maxX = (X-1) * xgap + minX
+    maxY = (Y-1) * ygap + minY
+    maxZ = (Z-1) * zgap + minZ
     dimX = X
     dimY = Y
     dimZ = Z
