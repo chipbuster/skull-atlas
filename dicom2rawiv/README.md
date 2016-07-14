@@ -31,7 +31,7 @@ Prerequisites are:
  * PyDICOM
  * Numpy
  * CMake
-    
+ 
 ## Install Instructions for ICES CentOS 7
 
 To install Numpy, do `easy_install-3.3 --user numpy`. You may need to run this 
@@ -53,6 +53,10 @@ Once you've decided on a prefix, make a build directory, `cd` into it, and run
 
 `cmake <path-to-source> -DCMAKE_INSTALL_PREFIX=<path-to-prefix>`
 
+NB: `<path-to-source>` needs to be the top level of the skull atlas project. The
+top-level cmake file provides several important variables for the rest of the 
+project.
+
 Then run `make` and `make install`.
 
 If all has gone well, you'll have a directory with a `bin`/`lib`/`include`/`share` 
@@ -60,8 +64,8 @@ structure. All the executables will be inside `bin`.
 
 ## Running
 
-Before you begin, make sure you have space: the final product will amount to
-over 2GB per patient.
+Before you begin, make sure you have disk: the final product will amount to
+over 2GB of disk space per patient.
 
 There are two steps to getting data: unpacking the zipfiles and generating 
 rawiv from DICOM.
@@ -75,8 +79,8 @@ so find a directory you want to do the work in. Then run
 
 `build_data_tree <Box Directory> <work directory>`
 
-(Unless you've changed the name, the Box Directory should almost certainly
-be named "Skull Atlas". Make sure you escape the space somehow.)
+You can replace `<Box Directory>` with any path--as long as that path contains
+`.zip` files which contain skull data, the script will happily extract them all.
 
 This will generate a working tree in `<work directory>` with uncompressed
 DICOM images and the structure mentioned in the `README.md` in zipextract.
