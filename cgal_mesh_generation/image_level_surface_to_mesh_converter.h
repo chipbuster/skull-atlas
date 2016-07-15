@@ -40,8 +40,8 @@ class ImageLevelSurfaceToMeshConverter {
 
     FT facet_angle_lower_bound_in_degree = 30;
     // TODO: Choose these parameters carefully.
-    FT delaunay_radius_upper_bound = 5;
-    FT delaunay_center_to_center_distance_upper_bound = 5;
+    FT delaunay_radius_upper_bound = 2;
+    FT delaunay_center_to_center_distance_upper_bound = 2;
     Surface_mesh_default_criteria_3<Tr> criteria(
         facet_angle_lower_bound_in_degree,
         delaunay_radius_upper_bound,
