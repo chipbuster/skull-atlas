@@ -6,7 +6,6 @@
 
 import numpy as np
 import struct
-import binascii
 
 def writeRawIV(data, filename, spacings):
     """Writes an array to a rawiv file specified by filename."""
@@ -86,8 +85,8 @@ def writeRawIV(data, filename, spacings):
 
 def readRawIV(fname):
     '''This function returns a dictionary with various entries, the last being the numpy array of data'''
-    
-    #These packers unpack the header bytes in big endian format 
+
+    #These packers unpack the header bytes in big endian format
     floatpacker = struct.Struct('>f')
     intpacker = struct.Struct('>I')
     dataDict={}
@@ -95,7 +94,7 @@ def readRawIV(fname):
         inp = infile.read(4)
         minX = floatpacker.unpack(inp)[0]
         dataDict['minX'] = minX
-       
+
         inp = infile.read(4)
         minY = floatpacker.unpack(inp)[0]
         dataDict['minY'] = minY
@@ -103,9 +102,9 @@ def readRawIV(fname):
         inp = infile.read(4)
         minZ = floatpacker.unpack(inp)[0]
         dataDict['minZ'] = minZ
-        
+
         inp = infile.read(4)
-        
+
         maxX = floatpacker.unpack(inp)[0]
         dataDict['maxX'] = maxX
 
@@ -128,7 +127,7 @@ def readRawIV(fname):
         inp = infile.read(4)
         dimX = intpacker.unpack(inp)[0]
         dataDict['dimX'] = dimX
-        
+
         inp = infile.read(4)
         dimY = intpacker.unpack(inp)[0]
         dataDict['dimY'] = dimY
@@ -160,7 +159,7 @@ def readRawIV(fname):
         inp = infile.read(4)
         spanZ = floatpacker.unpack(inp)[0]
         dataDict['spanZ'] = spanZ
-        
+
         #Now we unpack the data bytes in big endiand format and shape them in the
         #format specified by the header information (dimensions of x,y,z)
         inp=infile.read()
@@ -168,19 +167,17 @@ def readRawIV(fname):
         arrayData = arrpacker.unpack(inp)
         numpy_Arr=np.array(arrayData)
         numpy_Arr = np.reshape(numpy_Arr, (int(dataDict['dimX']),int(dataDict['dimY']),int(dataDict['dimZ'])), order= 'F')
-        #print('the shape is',numpy_Arr.shape)        
+        #print('the shape is',numpy_Arr.shape)
         dataDict['data']=numpy_Arr
-        
+
         return(dataDict)
-        
+
 def replaceWithZeros(dictionary,lothreshold, hithreshold):
-    
+
     '''This returns a dictionary with the data field filtered by replacing values lower than the lo threshold and higher than the hi threshold with zeros'''
     new_data=dictionary['data']
     new_data[new_data<int(lothreshold)]=np.zeros(1)
     new_data[new_data>int(hithreshold)]=np.zeros(1)
-         
-    dictionary['data']=new_data    
+
+    dictionary['data']=new_data
     return(dictionary)
-    
-        
