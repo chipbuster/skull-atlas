@@ -134,7 +134,7 @@ int main(int argc, char** argv) {
   printf("Number of duplicates removed: %df, %dv\n", removed, V.size() - count);
   printf("Finished! Writing output\n");
 
-  FILE* of = fopen(argv[4], "w");
+  FILE* of = fopen(output_mesh_filename, "w");
   for (int i = 0; i < V.size(); ++i) {
     if (named_V[i]) {
       fprintf(of, "v %lf %lf %lf\n",
