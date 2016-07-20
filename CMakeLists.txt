@@ -9,7 +9,7 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-option(BUILD_CGAL_MESH_GEN "Builds the CGAL-based mesh creation libraries" OFF)
+option(BUILD_CGAL_MESH_GEN "Builds the CGAL-based mesh creation libraries" ON)
 if(BUILD_CGAL_MESH_GEN)
   add_subdirectory(cgal_mesh_generation)
 endif(BUILD_CGAL_MESH_GEN)
