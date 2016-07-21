@@ -17,7 +17,7 @@ count=1
 for series in binned.values():
     if len(series) < 150:
         continue
-    
+
     try:
         (img,space) = make_one_volimage_with_spacings(series)
         writeRawIV(img,"test%d.rawiv"%(count), space)

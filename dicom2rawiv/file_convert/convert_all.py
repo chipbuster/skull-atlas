@@ -83,6 +83,13 @@ def patient_dicom_to_rawiv(inp_tuple):
         vol_out = os.path.join(rawiv_dir, volfile_name)
         mdt_out = os.path.join(mdata_dir, mdtfile_name)
 
+        # Determine if series is aligned axially. If not, discard it.
+        (_,ch_dim) = get_spacing(series)
+
+        # Image needs to change along Z axis
+        if ch_dim != 2:
+            continue
+
         # Make a numpy array out of the slices
         try:
             (img, (xs,ys,zs)) = make_one_volimage_with_spacings(series)
@@ -102,6 +109,9 @@ def patient_dicom_to_rawiv(inp_tuple):
         del img
 
     print("Done processing DICOM data for patient " + patient_id)
+
+    if len(os.listdir()) == 0:
+        print("[WARN]: Patient " + patient_id + " does not have any z-oriented series!")
 
 def main(path):
 

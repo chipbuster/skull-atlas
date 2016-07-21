@@ -58,6 +58,13 @@ def get_sort_val(myslice,ddim):
 
     return myslice.ImagePositionPatient[ddim]
 
+def get_orientation(slices):
+    """Gets orientation data from slices."""
+
+    myslice = next(iter(slices))
+
+    return myslice.ImageOrientationPatient
+
 def sort_slices(slices,ddim):
     """Sorts slices based on the ddim value of ImagePositionPatient, in increasing order"""
 
