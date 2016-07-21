@@ -68,7 +68,8 @@ if (LIBIGL_FOUND)
   include_directories(${LIBIGL_INCLUDE_DIRS})
   add_definitions(${LIBIGL_DEFINITIONS})
 
-  ### Add your project files
+  ### Add executables
+  # Segmentation program
   add_executable(segment cgal_segment.cpp ${LIBIGL_EXTRA_SOURCES})
   target_link_libraries(segment 
     ${CGAL_LIBRARIES} 
@@ -76,4 +77,13 @@ if (LIBIGL_FOUND)
     ${LIBIGL_LIBRARIES}
     ${LIBIGL_EXTRA_LIBRARIES})
   install (TARGETS segment DESTINATION bin)
+  
+  # Removal of non-body elements.
+  add_executable(precurate remove_nonbody.cpp ${LIBIGL_EXTRA_SOURCES})
+  target_link_libraries(precurate 
+    ${CGAL_LIBRARIES} 
+    ${CGAL_3RD_PARTY_LIBRARIES}
+    ${LIBIGL_LIBRARIES}
+    ${LIBIGL_EXTRA_LIBRARIES})
+  install (TARGETS precurate DESTINATION bin)
 endif(LIBIGL_FOUND)
