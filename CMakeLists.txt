@@ -1,6 +1,8 @@
 cmake_minimum_required (VERSION 2.8)
 project (Skull_atlas)
 
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
+
 # Locate custom find modules (e.g. CGAL)
 # set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake_modules")
 

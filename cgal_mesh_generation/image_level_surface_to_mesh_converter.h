@@ -1,4 +1,6 @@
-#include <limits>
+#ifndef SKULL_ATLAS_CGAL_MESH_GENERATION_IMAGE_LEVEL_SURFACE_TO_MESH_CONVERTER_H
+#define SKULL_ATLAS_CGAL_MESH_GENERATION_IMAGE_LEVEL_SURFACE_TO_MESH_CONVERTER_H
+
 #include <iostream>
 
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
@@ -8,6 +10,8 @@
 #include <CGAL/Polyhedron_3.h>
 #include <CGAL/Surface_mesh_default_triangulation_3.h>
 #include <CGAL/make_surface_mesh.h>
+
+#include "image_level_surface_function.h"
 
 namespace cvc {
 
@@ -22,7 +26,7 @@ class ImageLevelSurfaceToMeshConverter {
 
   // Converts "image" to a mesh, using the level surface at "iso_value".
   ::CGAL::Polyhedron_3<GT> convertToMesh(
-      const ::CGAL::Image_3& image, typename GT::FT iso_value){
+      const ::CGAL::Image_3& image, typename GT::FT isovalue){
 
     using namespace ::std;
     using namespace ::CGAL;
@@ -30,22 +34,22 @@ class ImageLevelSurfaceToMeshConverter {
 
     typedef typename Surface_mesh_default_triangulation_3_generator<GT>::Type Tr;
 
-    Implicit_surface_3<GT, ImageLevelSurfaceFunction> surface(
-        ImageLevelSurfaceFunction(&image, iso_value),
+    Implicit_surface_3<GT, ImageLevelSurfaceFunction<GT> > surface(
+        ImageLevelSurfaceFunction<GT>(&image, isovalue),
         computeBoundingSphere(image));
 
-    FT facet_angle_lower_bound_in_degrees = 30;
+    FT facet_angle_lower_bound_in_degree = 30;
     // TODO: Choose these parameters carefully.
-    FT delaunay_radius_upper_bound = 5;
-    FT delaunay_center_to_center_distance_upper_bound = 5;
+    FT delaunay_radius_upper_bound = 2;
+    FT delaunay_center_to_center_distance_upper_bound = 2;
     Surface_mesh_default_criteria_3<Tr> criteria(
-        facet_angle_lower_bound_in_degrees,
+        facet_angle_lower_bound_in_degree,
         delaunay_radius_upper_bound,
         delaunay_center_to_center_distance_upper_bound);
 
     Tr tr;
     Complex_2_in_triangulation_3<Tr> c2t3(tr);
-    make_surface_mesh(c2t3, surface, criteria, Manifold_tag());
+    make_surface_mesh(c2t3, surface, criteria, Manifold_tag(), 1000);
 
     Polyhedron_3<GT> polyhedron;
     output_surface_facets_to_polyhedron(c2t3, polyhedron);
@@ -77,44 +81,10 @@ class ImageLevelSurfaceToMeshConverter {
 
     return Sphere(center, squared_radius);
   }
-
-  // The level set surface of an image.
-  //
-  // Is Model Of: ::CGAL::ImplicitFunction
-  class ImageLevelSurfaceFunction {
-   public:
-
-    typedef typename GT::FT FT;
-
-    typedef typename GT::Point_3 Point;
-
-    // Constructs a level set surface of "image" at "iso_value".
-    ImageLevelSurfaceFunction(const ::CGAL::Image_3* image, FT iso_value)
-      : image_(image),
-        iso_value_(iso_value) {}
-
-    // Returns the value of the image at the "point" subtracted by iso_value.
-    //
-    // If the "point" is outside the image, negative infinity is returned.
-    // Otherwise, trilinear interpolation is used to calculate the value.
-    FT operator()(Point point) const {
-     using namespace ::std;
-
-      FT value_outside = -numeric_limits<FT>::infinity();
-
-      FT image_value = image_->trilinear_interpolation<float, FT>(
-          point.x(), point.y(), point.z(), value_outside);
-
-      return image_value - iso_value_;
-    }
-
-   private:
-    const ::CGAL::Image_3* image_;
-    FT iso_value_;
-  };
 };
 
 } // namespace skull_atlas
 
 } // namespace cvc
 
+#endif
