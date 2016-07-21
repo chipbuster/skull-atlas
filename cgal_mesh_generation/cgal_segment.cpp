@@ -17,12 +17,16 @@ typedef CGAL::Polyhedron_3<Kernel> Polyhedron;
 int main(int argc, char* argv[])
 {
   if (argc < 2) {
-    printf("usage: cgal_segment <input.off>\n");
+    fprintf(stderr,"usage: cgal_segment <input.off>\n");
     return -2;
   }
   // create and read Polyhedron
   Polyhedron mesh;
   std::ifstream input(argv[1]);
+  if ( !input ) {
+    std::cerr << "Input is bad from the beginning\n";
+    return EXIT_FAILURE;
+  }
   if ( !input || !(input >> mesh) || mesh.empty() ) {
     std::cerr << "Not a valid off file." << std::endl;
     return EXIT_FAILURE;
@@ -32,11 +36,11 @@ int main(int argc, char* argv[])
   typedef std::map<Polyhedron::Facet_const_handle, double> Facet_double_map;
   Facet_double_map internal_sdf_map;
   boost::associative_property_map<Facet_double_map> sdf_property_map(internal_sdf_map);
-  printf("Finishied sdf_property_map\n");
+  fprintf(stderr,"Finishied sdf_property_map\n");
 
   // compute SDF values using default parameters for number of rays, and cone angle
   CGAL::sdf_values(mesh, sdf_property_map);
-  printf("Finished generating sdf values\n");
+  fprintf(stderr,"Finished generating sdf values\n");
   // Get the mesh in an igl-friendly manner
   Eigen::MatrixXd V;
   Eigen::MatrixXi F;
@@ -68,7 +72,7 @@ int main(int argc, char* argv[])
   // Note that we can use the same SDF values (sdf_property_map) over and over again for segmentation.
   // This feature is relevant for segmenting the mesh several times with different parameters.
   std::size_t number_of_segments = CGAL::segmentation_from_sdf_values(mesh, sdf_property_map, segment_property_map);
-  printf("Number of segments: %d\n", number_of_segments);
+  fprintf(stderr,"Number of segments: %d\n", number_of_segments);
 
   i = 0;
   for(Polyhedron::Facet_const_iterator facet_it = mesh.facets_begin();
@@ -80,7 +84,7 @@ int main(int argc, char* argv[])
   //std::cout << std::endl;
   igl::jet(cols, true, C);
   viewer.data.set_colors(C);
-  printf("Finished!\n");
+  fprintf(stderr,"Finished!\n");
 
   viewer.callback_init = [&](igl::viewer::Viewer& viewer) {
     viewer.ngui->addWindow(Eigen::Vector2i(220,10),"Segment Options");
@@ -88,12 +92,12 @@ int main(int argc, char* argv[])
     viewer.ngui->addVariable("lambda", smoothing_lambda);
     viewer.ngui->addVariable("hard clusters", hard_clusters);
     viewer.ngui->addButton("Redraw",[&]() {
-           printf("Redrawing for %d segs and %lf lambda...",
+           fprintf(stderr,"Redrawing for %d segs and %lf lambda...",
                   num_clusters, smoothing_lambda);
            size_t number_of_segments = CGAL::segmentation_from_sdf_values(
                mesh, sdf_property_map, segment_property_map,
                num_clusters, smoothing_lambda, hard_clusters);
-           printf("Number of segments: %d...", number_of_segments);
+           fprintf(stderr,"Number of segments: %d...", number_of_segments);
 
            i = 0;
            for(Polyhedron::Facet_const_iterator facet_it = mesh.facets_begin();
@@ -105,7 +109,7 @@ int main(int argc, char* argv[])
            //std::cout << std::endl;
            igl::jet(cols, true, C);
            viewer.data.set_colors(C);
-           printf("Finished!\n");
+           fprintf(stderr,"Finished!\n");
         });
       viewer.screen->performLayout();
       return false;
