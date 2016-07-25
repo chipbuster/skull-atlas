@@ -1,4 +1,5 @@
 #include <cstdio>
+#include <cstdlib>  // for atof
 #include <fstream>
 
 #include <CGAL/IO/print_wavefront.h>
@@ -13,8 +14,9 @@ int main(int argc, char* argv[]) {
   using namespace ::cvc::skull_atlas;
   typedef Polyhedron_3<Exact_predicates_inexact_constructions_kernel> Polyhedron;
 
-  if (argc != 4) {
-    fprintf(stderr, "Usage: %s input_image.inr output_mesh.obj isovalue\n", argv[0]);
+  if (argc < 4 || argc > 5) {
+    fprintf(stderr, "This program meshes an INR file at the requested isocontour and resolution.\n");
+    fprintf(stderr, "Usage: %s input_image.inr output_mesh.obj isovalue [mesh resolution = 1.0]\n", argv[0]);
     return -1;
   }
 
@@ -34,7 +36,14 @@ int main(int argc, char* argv[]) {
     return -1;
   }
 
-  Polyhedron mesh = ImageLevelSurfaceToMeshConverter<>().convertToMesh(image, isovalue);
+  Polyhedron mesh;
+  auto converter = ImageLevelSurfaceToMeshConverter<>();
+
+  if (argc == 4){ mesh = converter.convertToMesh(image,isovalue);}
+  else if (argc == 5){
+    double lod = atof(argv[4]);
+    mesh = converter.convertToMesh(image,isovalue, lod);
+  }
 
   {
     ofstream fout(output_mesh_filename);

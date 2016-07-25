@@ -26,7 +26,8 @@ class ImageLevelSurfaceToMeshConverter {
 
   // Converts "image" to a mesh, using the level surface at "iso_value".
   ::CGAL::Polyhedron_3<GT> convertToMesh(
-      const ::CGAL::Image_3& image, typename GT::FT isovalue){
+     const ::CGAL::Image_3& image, typename GT::FT isovalue,
+     typename GT::FT level_of_detail = 1.0    ){
 
     using namespace ::std;
     using namespace ::CGAL;
@@ -40,8 +41,8 @@ class ImageLevelSurfaceToMeshConverter {
 
     FT facet_angle_lower_bound_in_degree = 30;
     // TODO: Choose these parameters carefully.
-    FT delaunay_radius_upper_bound = 2;
-    FT delaunay_center_to_center_distance_upper_bound = 2;
+    FT delaunay_radius_upper_bound = level_of_detail;
+    FT delaunay_center_to_center_distance_upper_bound = level_of_detail;
     Surface_mesh_default_criteria_3<Tr> criteria(
         facet_angle_lower_bound_in_degree,
         delaunay_radius_upper_bound,
@@ -68,7 +69,7 @@ class ImageLevelSurfaceToMeshConverter {
 
     using namespace ::std;
     using namespace ::CGAL;
-    
+
     // The image must have a negative value at the center.
     Point center( -image.vx(), -image.vy(), -image.vz());
 
