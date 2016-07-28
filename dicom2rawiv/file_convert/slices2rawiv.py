@@ -57,6 +57,14 @@ def make_one_volimage_with_spacings(slices_w_names):
         vol_image[:,:,z_index] = dicomutil.get_image(ds)
         del ds
 
+    # Get the Hounsfield coefficients and convert the image to HU
+
+    hounsfield_example_image = next(iter(slices))
+    (h_slope, h_intercept) = dicomutil.get_hounsfield_coeffs(hounsfield_example_image)
+
+    vol_image = h_slope * vol_image + h_intercept
+
+    # Define spacings
     xspace = spacings.item(0)
     yspace = spacings.item(1)
     zspace = spacings.item(2)

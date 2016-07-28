@@ -122,6 +122,7 @@ def get_hounsfield_coeffs(ds_open_file):
 
     return (rescale_slope,rescale_intercept)
 
+
 ##################################################
 ## This function is currently unused and untested
 ##################################################
