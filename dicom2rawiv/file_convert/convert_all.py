@@ -45,14 +45,15 @@ def patient_dicom_to_rawiv(inp_tuple):
     rawiv_dir = os.path.join(path,'VOLIMG')
     mdata_dir = os.path.join(path,'METADATA')
 
-    all_dicoms = read_all_dicom_in_dirpath(dicom_dir)
-    binned_dicoms = list(sep_into_bins(all_dicoms).values())
+    dicoms_w_fnames = read_all_dicom_in_dirpath(dicom_dir)
+    binned_dicoms = list(sep_into_bins(dicoms_w_fnames).values())
 
     counter = 1
 
     print("Processing DICOM data for patient " + patient_id)
 
     ## First, dump the study metadata
+    all_dicoms = [ x for (x,_) in dicoms_w_fnames ]
     study_mdata = dicomutil.get_study_metadata(all_dicoms)
     study_mdata['PatientID'] = patient_id #Override Study settings
     study_mdata_file = os.path.join(mdata_dir, 'study.json')
@@ -60,17 +61,17 @@ def patient_dicom_to_rawiv(inp_tuple):
     with open(study_mdata_file,'w') as outfile:
         json.dump(study_mdata,outfile)
 
-    for series in binned_dicoms:
+    for series_w_fnames in binned_dicoms:
         # If the series is small, ignore it--probably close-ups or too coarse
-        if len(series) < 100:
-            for s in series:
-                del s
-            del series
+        if len(series_w_fnames) < 100:
             continue
 
         # Give this series an identifier
         series_name = "series_%d" % counter
         counter += 1
+
+        # Extract the actual dicom out of the tuples
+        series = [ x for (x,_) in series_w_fnames ]
 
         # Gather interesting metadata on this series
         series_mdata = dicomutil.get_series_metadata(series)
@@ -92,7 +93,7 @@ def patient_dicom_to_rawiv(inp_tuple):
 
         # Make a numpy array out of the slices
         try:
-            (img, (xs,ys,zs)) = make_one_volimage_with_spacings(series)
+            (img, (xs,ys,zs)) = make_one_volimage_with_spacings(series_w_fnames)
         except ValueError as verror:
             print("While trying to process series " + series_name + " for patient " + patient_id +
                   "\n" "in directory " + path + " I found a DICOM error which does not allow me to proceed."
@@ -124,10 +125,10 @@ def main(path):
 
     print("Finished constructing directory listing")
 
-#    ncpu = multiprocessing.cpu_count()
-    pool = multiprocessing.Pool(processes=3)
+    ncpu = multiprocessing.cpu_count()
+    pool = multiprocessing.Pool(processes=8)
 
-    pool.map(patient_dicom_to_rawiv, datadirs)
+    pool.map(patient_dicom_to_rawiv, datadirs, chunksize=1)
 
 if __name__ == '__main__':
     main(sys.argv[1])

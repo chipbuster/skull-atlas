@@ -62,6 +62,11 @@ def get_image(ds_open_file):
                          +'but its PhotometricInterpretation value is: ' + pminterp
                          +'which I do not understand.')
 
+def get_image_metadata(ds_open_file):
+    """Given an open file, gets only the metadata  by deleting the data"""
+
+    del ds_open_file.PixelData
+    return ds_open_file
 
 def get_value(dicoms,valstring):
     """Given a set of DICOM images, searches for valstring in the DICOM data.
@@ -108,6 +113,14 @@ def get_study_metadata(study):
 
 def get_dicom_file(filename):
     return dicom.read_file(filename)
+
+def get_hounsfield_coeffs(ds_open_file):
+    """Returns the slope-intercept pair needed to convert an image
+    to Hounsfield units"""
+    rescale_slope = ds_open_file[0x28, 0x1053].value
+    rescale_intercept = ds_open_file[0x28,0x1052].value
+
+    return (rescale_slope,rescale_intercept)
 
 ##################################################
 ## This function is currently unused and untested

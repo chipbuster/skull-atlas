@@ -14,38 +14,48 @@ def read_all_dicom_in_dirpath(path):
     all_dicom = list()
 
     for fname in os.listdir(path):
-        all_dicom.append(dicom.read_file(os.path.join(path,fname)))
+        dicomobj = dicom.read_file(os.path.join(path,fname))
+        dicomobj = dicomutil.get_image_metadata(dicomobj) #Drop raw data
+        filename = os.path.join(path,fname)
+        all_dicom.append((dicomobj,filename))
 
     return all_dicom
 
-def sep_into_bins(slices):
-    """Given a group of DICOM slices, separate out into sets of DICOM images
-    partitioned by the SeriesInstanceUID"""
+def sep_into_bins(inp):
+    """Given a group of (DICOM slice,filename) tuples, separate out into sets
+    of DICOM images partitioned by the SeriesInstanceUID"""
 
     buckets = defaultdict(list)
 
-    for img in slices:
+    # Extract slice info
+
+    for img,fname in inp:
         siuid = img.SeriesInstanceUID
-        buckets[siuid].append(img)
+        buckets[siuid].append((img,fname))
 
     return buckets
 
-def make_one_volimage_with_spacings(slices):
-    """Takes a set of PyDICOM DataSet objects (returned by dicom.read_file) and
-    renders them into a numpy array. This numpy array is ready to be written
+def make_one_volimage_with_spacings(slices_w_names):
+    """Takes a list of (DataSet, filename) objects (where datasets have no PixelData)
+    and renders them into a numpy array. This numpy array is ready to be written
     to file w/ writeRawIV. The function also returns the image spacings.
     The DataSet objects should all come from
     the same DICOM series: this is not enforced, and strange results may happen
     if this requirement is not met."""
 
+    slices = [ x for (x,_) in slices_w_names ]
     vol_image = np.zeros(get_dims(slices)) #Initialize a zero image
 
     (spacings,changing_dimension) = get_spacing(slices)
 
-    image_as_list = sort_slices(slices, changing_dimension)
+    image_as_list = sort_slices(slices_w_names, changing_dimension)
 
+    # Build the image one slice at a time
     for z_index, image in enumerate(image_as_list):
-        vol_image[:,:,z_index] = dicomutil.get_image(image)
+        (_,filename) = image
+        ds = dicom.read_file(filename)
+        vol_image[:,:,z_index] = dicomutil.get_image(ds)
+        del ds
 
     xspace = spacings.item(0)
     yspace = spacings.item(1)
@@ -54,9 +64,15 @@ def make_one_volimage_with_spacings(slices):
     return (vol_image, (xspace,yspace,zspace))
 
 def get_sort_val(myslice,ddim):
-    """Gets the value to sort a slice by, given the changing coordinate"""
+    """Gets the value to sort a slice by, given the changing coordinate. Can handle either
+    tuples of (dicom,filename) or a simple dicom object"""
 
-    return myslice.ImagePositionPatient[ddim]
+    if type(myslice) == tuple:
+        return myslice[0].ImagePositionPatient[ddim]
+    else:
+        return myslice.ImagePositionPatient[ddim]
+
+
 
 def get_orientation(slices):
     """Gets orientation data from slices."""
@@ -70,7 +86,9 @@ def sort_slices(slices,ddim):
 
     list_of_slices = list(slices)
 
+    # Since sls is a tuple, extract the DICOM (0th element of sls) and sort w/ that
     return sorted(list_of_slices, key = lambda sls: get_sort_val(sls,ddim))
+
 
 def get_dims(slices):
     """Given a set of slices, gets number of pixels along x,y,z of reconstructed
@@ -85,7 +103,7 @@ def get_dims(slices):
 
 # this function is a bit...confusing, given its history
 def get_spacing(slices):
-    """Given a set of slices, gets spacings between x,y,z for reconstructed
+    """Given a set of slices w/ fnames, gets spacings between x,y,z for reconstructed
     volumetric image. This is returned as a numpy matrix, column format.
     Also returns the changing dimension in the ImagePositionPatient
     (0 = x, 1 = y, 2 = z)"""
