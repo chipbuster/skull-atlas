@@ -79,3 +79,83 @@ def writeRawIV(data, filename, spacings):
     del arrpacker
 
     return
+
+def readRawIV(fname):
+    '''Returns a dictionary with various entries representing a DICOM file'''
+
+    #These packers unpack the header bytes in big endian format
+    floatpacker = struct.Struct('>f')
+    intpacker = struct.Struct('>I')
+    rawivDict={}
+
+    with open(fname,'rb') as infile:
+        inp = infile.read(4)
+        minX = floatpacker.unpack(inp)[0]
+
+        inp = infile.read(4)
+        minY = floatpacker.unpack(inp)[0]
+
+        inp = infile.read(4)
+        minZ = floatpacker.unpack(inp)[0]
+
+        inp = infile.read(4)
+        maxX = floatpacker.unpack(inp)[0]
+
+        inp = infile.read(4)
+        maxY = floatpacker.unpack(inp)[0]
+
+        inp = infile.read(4)
+        maxZ = floatpacker.unpack(inp)[0]
+
+        inp = infile.read(4)
+        numVerts = intpacker.unpack(inp)[0]
+
+        inp = infile.read(4)
+        numCells = intpacker.unpack(inp)[0]
+
+        inp = infile.read(4)
+        dimX = intpacker.unpack(inp)[0]
+
+        inp = infile.read(4)
+        dimY = intpacker.unpack(inp)[0]
+
+        inp = infile.read(4)
+        dimZ = intpacker.unpack(inp)[0]
+
+        inp = infile.read(4)
+        originX = floatpacker.unpack(inp)[0]
+
+        inp = infile.read(4)
+        originY = floatpacker.unpack(inp)[0]
+
+        inp = infile.read(4)
+        originZ = floatpacker.unpack(inp)[0]
+
+        inp = infile.read(4)
+        spanX = floatpacker.unpack(inp)[0]
+
+        inp = infile.read(4)
+        spanY = floatpacker.unpack(inp)[0]
+
+        inp = infile.read(4)
+        spanZ = floatpacker.unpack(inp)[0]
+
+        # Place appropriate entries into rawiv representation
+        rawivDict['min'] = (minX,minY,minZ)
+        rawivDict['max'] = (maxX,maxY,maxZ)
+        rawivDict['numVerts'] = numVerts
+        rawivDict['numCells'] = numCells
+        rawivDict['dim'] = (dimX,dimY,dimZ)
+        rawivDict['origin'] = (originX,originY,originZ)
+        rawivDict['span'] = (spanX, spanY, spanZ)
+
+        # Now extract rawIV data and form into shape given by header data
+        arrpacker = struct.Struct('>%df' % numVerts)
+        inp=infile.read()
+
+        arr = np.array(arrpacker.unpack(inp))
+        imgdata = np.reshape(arr, (int(dimX),int(dimY),int(dimZ)), order= 'F')
+
+        rawivDict['data'] = imgdata
+
+        return rawivDict
