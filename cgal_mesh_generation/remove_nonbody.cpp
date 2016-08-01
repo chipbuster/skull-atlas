@@ -50,13 +50,12 @@ int main(int argc, char* argv[]) {
   if (argc == 5) {
     debug = true;
   }
-  /*
+  
   CGAL::Random::State state;
   unsigned int seed = 0;
   CGAL::Random random(seed);
   random.save_state(state);
   default_random.restore_state(state);
-  */
 
   const char* input_image_filename = argv[1];
   const char* output_mesh_filename = argv[2];
