@@ -19,10 +19,6 @@ add_executable(surf2medax surface_medax.cpp)
 target_link_libraries(surf2medax ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES})
 install (TARGETS surf2medax DESTINATION bin)
 
-add_executable(cgal_simple_shapes cgal_cube.cpp)
-target_link_libraries(cgal_simple_shapes ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES})
-install (TARGETS cgal_simple_shapes DESTINATION bin)
-
 # Segment library uses libigl. Findlibigl is in cmake dir
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 # Can use libigl found at /net/electron/workspace/nclement/software/libigl/build
