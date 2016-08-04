@@ -21,7 +21,8 @@
 # attempt to warn the user about the error, but it will not intentionally form
 # a rawIV that it knows to be damaged.
 
-# Unfortunately, this thing leaks memory like a mother.
+# Unfortunately, this thing leaks memory like a mother. An 8-core run can survive on
+# about 20GB of memory--I would not suggest going over that without at least 32 to spare
 
 import sys
 import os

@@ -16,20 +16,20 @@ def threshold(args):
     else:
 
         #first extract header information and make a dictionary of header and data info
-        dataDict=readRawIV(sys.argv[1])
+        dataDict=readRawIV(args[1])
 
         #extract spacings, i.e. the span of x,y,z
         spacings=(dataDict['spanX'],dataDict['spanY'],dataDict['spanZ'])
 
         #this step sets any value lower or higher than the two thresholds to 0
-        newDataDict=replaceWithZeros(dataDict, sys.argv[2],sys.argv[3])
+        newDataDict=replaceWithZeros(dataDict, args[2],args[3])
 
         #this step names and writes the output file
-        if len(sys.argv)!=5:
-            outputName=(str(sys.argv[1])[:-6] + '_filtered' + str(sys.argv[1][-6:]))
+        if len(args)!=5:
+            outputName=(str(args[1])[:-6] + '_filtered' + str(args[1][-6:]))
             writeRawIV(newDataDict['data'], outputName, spacings)
         else:
-            writeRawIV(newDataDict['data'], sys.argv[4], spacings)
+            writeRawIV(newDataDict['data'], args[4], spacings)
 
 if __name__ == '__main__':
     threshold(sys.argv)
