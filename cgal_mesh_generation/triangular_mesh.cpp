@@ -4,6 +4,8 @@
 #include <map>
 #include <vector>
 
+#include "igl/polygon_mesh_to_triangle_mesh.h"
+
 struct Point_3 {
   Point_3(double _x, double _y, double _z) : x(_x), y(_y), z(_z) { }
   Point_3(const Point_3 &other) {
@@ -28,9 +30,10 @@ struct Point_3 {
 
 class Triangulation {
  private:
-  int start_idx = 0;
+  const int start_idx = 0;
  public:
   Triangulation() {
+    _is_triangle_mesh = true;
     _vert_idx = start_idx; // Starts at 0 for an off file.
   }
   Triangulation(const std::vector<Point_3> &v,
@@ -49,6 +52,13 @@ class Triangulation {
 
   void set_facets(const std::vector<std::vector<int> >& f) {
     _facets = f;
+    // Make sure it's still triangle
+    for (const auto & ff : f) {
+      if (ff.size() != 3) {
+        _is_triangle_mesh = false;
+        return;
+      }
+    }
   }
 
   void insert_facet(const std::vector<Point_3> &pts) {
@@ -63,6 +73,10 @@ class Triangulation {
     }
 
     _facets.push_back(facet);
+
+    if (pts.size() != 3) {
+      _is_triangle_mesh = false;
+    }
   }
 
   Point_3 v(int i) const {
@@ -77,6 +91,26 @@ class Triangulation {
       _verts_map[p] = _vert_idx++;
     }
     return _verts_map[p];
+  }
+
+  // Will make this a regular triangulation, instead of an irregular one.
+  void make_regular() {
+    if (_is_triangle_mesh) {
+      return;
+    }
+
+    // Use this function from igl to not add any vertices.
+    Eigen::MatrixXi F;
+    igl::polygon_mesh_to_triangle_mesh(_facets, F);
+    _facets.resize(F.rows());
+    for (int i = 0; i < F.rows(); ++i) {
+      _facets[i].resize(3);
+      for (int j = 0; j < 3; ++j) {
+        _facets[i][j] = F(i, j);
+      }
+    }
+
+    _is_triangle_mesh = true;
   }
 
   void write_off(const char* fn) const {
@@ -99,41 +133,16 @@ class Triangulation {
     }
     fclose(ofs);
   }
+
  private:
-  int _vert_idx;   // 1-based index for faces
+  int _vert_idx;   // 0-based index for faces
 
   std::map<Point_3, int> _verts_map;
   std::vector<Point_3> _verts_linear;
   std::vector<std::vector<int> > _facets;
+  
+  bool _is_triangle_mesh;  // If it's a triangle mesh, this will be true.
 };
-
-void make_facet_triangular(const std::vector<int> &f,
-                           Triangulation &triang,
-                           std::vector<std::vector<int> > &facets) {
-  // Get the centroid
-  double total_x = 0;
-  double total_y = 0;
-  double total_z = 0;
-  for (int i = 0; i < f.size(); ++i) {
-    total_x += triang.v(f[i]).x;
-    total_y += triang.v(f[i]).y;
-    total_z += triang.v(f[i]).z;
-  }
-  total_x /= f.size();
-  total_y /= f.size();
-  total_z /= f.size();
-
-  Point_3 mid(total_x, total_y, total_z);
-  // Make sure you add it to the triangulation.
-  int mid_idx = triang.add_vertex(mid);
-
-  // Now, construct new faces that have all edges with a point in the middle.
-  facets.clear();
-  for (int i = 0; i < f.size(); ++i) {
-    // triangle with midpoint and two points.
-    facets.push_back({mid_idx, f[i], f[(i+1) % f.size()]});
-  }
-}
 
 int main(int argc, char* argv[]) {
   if (argc < 3) {
@@ -214,19 +223,14 @@ int main(int argc, char* argv[]) {
       facet_big.push_back(idx);
     }
 
-    if (facet_big.size() == 3) {
-      faces.push_back(facet_big);
-    } else {
-      std::vector<std::vector<int> > facet_all;
-      make_facet_triangular(facet_big, triang, facet_all);
-      for (const auto &f : facet_all) {
-        faces.push_back(f);
-      }
-    }
+    faces.push_back(facet_big);
   }
 
   printf("Size of faces is now %d\n", faces.size());
   triang.set_facets(faces);
+
+  // Make it a triangle instead of polyhedron
+  triang.make_regular();
 
   // Then, output the mesh.
   triang.write_off(argv[2]);

@@ -21,10 +21,6 @@ add_executable(surf2medax surface_medax.cpp)
 target_link_libraries(surf2medax ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES})
 install (TARGETS surf2medax DESTINATION bin)
 
-# This will convert a non-triangular .off file to a triangular .off file.
-add_executable(triangular_mesh triangular_mesh.cpp)
-target_link_libraries(triangular_mesh ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES})
-install (TARGETS triangular_mesh DESTINATION bin)
 
 # Segment library uses libigl. Findlibigl is in cmake dir
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
@@ -98,4 +94,13 @@ if (LIBIGL_FOUND)
     ${LIBIGL_LIBRARIES}
     ${LIBIGL_EXTRA_LIBRARIES})
   install (TARGETS precurate DESTINATION bin)
+
+  # This will convert a non-triangular .off file to a triangular .off file.
+  add_executable(triangular_mesh triangular_mesh.cpp)
+  target_link_libraries(triangular_mesh 
+    ${CGAL_LIBRARIES} 
+    ${CGAL_3RD_PARTY_LIBRARIES}
+    ${LIBIGL_LIBRARIES}
+    ${LIBIGL_EXTRA_LIBRARIES})
+  install (TARGETS triangular_mesh DESTINATION bin)
 endif(LIBIGL_FOUND)
