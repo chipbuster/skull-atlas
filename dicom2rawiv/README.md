@@ -105,3 +105,30 @@ and it will generate rawiv and metadata JSONs.
 
 The rawIV files will go to `VOLIMG` and the metadata to `METADATA` for each
 patient, as described in the `zipextract` README.
+
+## Developer Notes
+
+There are four general stages in this pipeline:extraction,decompression,rawiv creation,and metadata creation.
+
+There are three DICOM grouping levels: a *study* is what happens when the patient goes and lies in the CT machine. The doctors may take multiple scans and have the patient move around a bit--once the patient gets up and leaves the room, the study is over. (This is a slight oversimplification, but useful).
+A *series* is a single scan. What we think of as a "scan" of the head is a series. Every study should have at least one series of all or most of the skull, there may be many additional series in the study. An *image* is a 2D slice of a study, and is analagous to a photo. A bunch of images form a study.
+
+#### Extraction
+
+DICOM input shows up from Dr. Ross as a series of ZIP files. Depending on how the PACS server was feeling that day, the zipfiles might have various structures, different nesting patterns, etc. These are handled by cases in the zip extraction script. This part of the program is handled on a case-by-case basis and is a bit hacky. Once it is done, each patient should have a directory structure as described at the top of this page, and all the DICOM images inside the zip should be in the `DICOMOBJ` directory.
+
+#### Decompression
+
+The [PyDICOM package](http://www.pydicom.org/) cannot yet (Summer 2016) view compressed images. Unfortunately, some of the data comes in JPEG format (this is allowed by the DICOM standard), which iscompressed. To fix this, we use `gdcmconv`, which is part of the [Grassroots DICOM package](https://sourceforge.net/projects/gdcm/), to decompress the images. At the end of this stage, uncompressed DICOM images should be stored at `DICOMUNC` directory.
+
+Note that if, in the future, PyDICOM becomes capable of reading compressed images, this step can be dropped and `DICOMUNC` can be replaced with a symlink to `DICOMOBJ`
+
+#### RawIV Creation
+
+While DICOM files are inherently 2D images, rawiv files are volumetric. This means that we need to somehow "stack" the DICOM slices to make a volumetric image.
+
+If the slices were always in a consistent direction (e.g. always starting at the top of the head and moving down) and consistently spaced, this would be a pretty easy task. Of course, we're not so lucky. Some of the issues we have to deal with are:
+
+  * Some series have partial scans, i.e. not of the entire skull. We need some way to filter these series out. (Soln: reject any series with fewer than N images. In practice this does a pretty good job of rejecting small scans)
+  * Spacing may be inconsistent--there may only be 0.5mm between pixels in the same image, but 2mm between images. We need to account for this when making the rawiv.
+

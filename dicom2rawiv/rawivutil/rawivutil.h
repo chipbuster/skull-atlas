@@ -1,10 +1,10 @@
 #ifndef RAWIVUTIL_H
 #define RAWIVUTIL_H
 
-#include<tuple>
 #include<vector>
 #include<string>
 #include<cstdint>
+#include<iostream>
 
 namespace RawivUtil{
 
@@ -23,7 +23,16 @@ namespace RawivUtil{
       y = y_in;
       z = z_in;
     }
+
+    bool operator==(const Point3& other) const{
+      return other.x == x && other.y == y && other.z == z;
+    }
   };
+
+  template <typename T>
+  std::ostream &operator <<(std::ostream &os, const Point3<T> &m){
+    return os << "(" << m.x << " , " << m.y << " , " << m.z << ")";
+  }
 
   class RawivImage{
   private:
@@ -60,8 +69,29 @@ namespace RawivUtil{
     //Coordinate access
     float& operator() (uint32_t i, uint32_t j, uint32_t k);
     const float& operator() (uint32_t i, uint32_t j, uint32_t k) const;
+
+    float& operator() (Point3<uint32_t> k);
+    const float& operator() (Point3<uint32_t> k) const;
   };
 
+}
+
+// Declare a hash for use with hashing containers.
+namespace std {
+  template <>
+    struct hash<RawivUtil::Point3<uint32_t> >
+    {
+      typedef RawivUtil::Point3<uint32_t> argument_type;
+      typedef std::size_t  result_type;
+
+      result_type operator()(const argument_type & t) const
+      {
+        // 683 is an IEEE-approved prime number
+        return ((683 + hash<uint32_t>()(t.x)) *
+                 (683 + (hash<uint32_t>()(t.y)))) *
+                (683 + hash<uint32_t>()(t.z));
+      }
+    };
 }
 
 #endif

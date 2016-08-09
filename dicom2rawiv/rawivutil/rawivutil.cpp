@@ -193,15 +193,23 @@ void RawivImage::writeToFile(std::string filename){
   rawivOut.close();
 }
 
+// The accessor-mutator block
 float& RawivImage::operator() (uint32_t i, uint32_t j, uint32_t k){
   // Access data in column-major order (because rawiv)
-  uint32_t index = i + dim.x * j + dim.x * dim.y * k;
+  uint32_t index = i + dim.x * ( j + dim.y * k );
   return this->data.at(index);
 }
 const float& RawivImage::operator() (uint32_t i, uint32_t j, uint32_t k) const{
   // Access data in column-major order (because rawiv)
-  uint32_t index = i + dim.x * j + dim.x * dim.y * k;
+  uint32_t index = i + dim.x * ( j + dim.y * k );
   return this->data.at(index);
+}
+// For Coords
+float& RawivImage::operator() (Point3<uint32_t> inp){
+  return (*this)(inp.x,inp.y,inp.z);
+}
+const float& RawivImage::operator() (Point3<uint32_t> inp) const{
+  return (*this)(inp.x,inp.y,inp.z);
 }
 
 uint32_t RawivImage::bytesToUint(uint32_t byte){
