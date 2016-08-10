@@ -179,7 +179,6 @@ void RawivImage::writeToFile(std::string filename){
 
   uint32_t* uintData = reinterpret_cast<uint32_t*>(newVectorData.data());
 
-  #pragma omp parallel for
   for (size_t j = 0; j < data.size(); j++){
     uintData[j] = htobe32(uintData[j]);
   }
