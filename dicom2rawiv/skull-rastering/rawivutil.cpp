@@ -109,7 +109,6 @@ void RawivImage::readFromFile(std::string filename){
 
   if (dataElementSize == 1){
     //Convert array elements from char to float
-    #pragma omp parallel for
     for(uint32_t j = 0; j < numVerts; j++){
       data.at(j) = static_cast<float>(byteData[j]);
     }
@@ -117,7 +116,6 @@ void RawivImage::readFromFile(std::string filename){
   else if (dataElementSize == 2){
     //Reinterpret as shorts, then fill data
     uint16_t* shortData = reinterpret_cast<uint16_t*>(byteData);
-    #pragma omp parallel for
     for(uint32_t j = 0; j < numVerts; j++){
       shortData[j] = be16toh(shortData[j]);
       data.at(j) = static_cast<float>(shortData[j]);
@@ -126,7 +124,6 @@ void RawivImage::readFromFile(std::string filename){
   else{
     //We have float data. Reinterpret and assign to vector
     uint32_t* floatData = reinterpret_cast<uint32_t*>(byteData);
-    #pragma omp parallel for
     for (uint32_t j = 0; j < numVerts; j++){
       data.at(j) = this->bytesToFloat(floatData[j]);
     }
@@ -196,12 +193,12 @@ void RawivImage::writeToFile(std::string filename){
 // The accessor-mutator block
 float& RawivImage::operator() (uint32_t i, uint32_t j, uint32_t k){
   // Access data in column-major order (because rawiv)
-  uint32_t index = i + dim.x * j + dim.x * dim.y * k;
+  uint32_t index = i + dim.x * ( j + dim.y * k );
   return this->data.at(index);
 }
 const float& RawivImage::operator() (uint32_t i, uint32_t j, uint32_t k) const{
   // Access data in column-major order (because rawiv)
-  uint32_t index = i + dim.x * j + dim.x * dim.y * k;
+  uint32_t index = i + dim.x * ( j + dim.y * k );
   return this->data.at(index);
 }
 // For Coords
@@ -218,8 +215,15 @@ uint32_t RawivImage::bytesToUint(uint32_t byte){
 }
 
 float RawivImage::bytesToFloat(uint32_t byte){
+  /* Reinterpret-casting this breaks strict type punning. Instead, use
+     the mempcy trick to convert types. */
+
+  static_assert(sizeof(float)==sizeof(uint32_t));
   uint32_t tmp = be32toh(byte);
-  return reinterpret_cast<float&>(tmp);
+  float f;
+  memcpy(&f, &tmp, sizeof(float));
+
+  return f;
 }
 long RawivImage::getFileSize(std::string filename){
   struct stat stat_buf;

@@ -19,13 +19,10 @@ typedef queue<Coord> CoordQ;
 
 /* Initializes the voxel set we start searching from */
 void initKnownVoxels(CoordSet &knownVoxels, RawivImage const &img, int threshold){
-  cout << "Looking for initial set " << endl;
   // Need to do column-major iteration to take advantage of cache locality
   for(size_t k = 0; k < img.dim.z; k++){
     for(size_t j = 0; j < img.dim.y; j++){
-      #pragma omp parallel for
       for(size_t i = 0; i < img.dim.x; i++){
-        if (j == 0 && i == 0) cout << "Z Coord is " << k << endl; //DEBUG
         if (img(i,j,k) > threshold){ knownVoxels.insert(Coord(i,j,k)); }
       }
     }
@@ -42,10 +39,11 @@ inline bool isIn(Coord toTest,CoordSet const &known){
    the valid neighbors of the input coordinate */
 CoordSet getNeighbors(Coord inp, Coord boundaries){
   CoordSet neighbors = CoordSet();
-  for(auto i = -1; i <= 1; i++){
-    for(auto j = -1; j <= 1; j++){
-      #pragma omp parallel for
-      for(auto k = -1; k <= 1; k++){
+  constexpr unsigned int radius = 2; // How many voxels to each side do we define as a "neighbor"
+
+  for(auto i = -2; i <= 2; i++){
+    for(auto j = -2; j <= 2; j++){
+      for(auto k = -2; k <= 2; k++){
         size_t x = inp.x + i;
         size_t y = inp.y + j;
         size_t z = inp.z + k;
@@ -64,14 +62,18 @@ CoordSet getNeighbors(Coord inp, Coord boundaries){
 /* Runs BFS (dur!) */
 void runBFS(CoordSet &known, CoordQ &active, Coord maxDim, RawivImage const &img, int threshold){
 
+  long ctr = 5000;
+
   //TODO: Figure out how to task this sucker
   while(!active.empty()){
     Coord current = active.front();
     active.pop();
 
-    cout << "Known Voxel Count: " << known.size() << endl;
-    cout << "Active Voxel Count: " << active.size() << endl;
-    cout << endl;
+    ctr--;
+    if (ctr == 0){
+    cout << "Active Voxel Count (program will finish when this reaches zero): " << active.size() << endl;
+    ctr = 50000;
+    }
 
     CoordSet currNeighbors = getNeighbors(current, maxDim);
     for (auto& elem : currNeighbors){
@@ -106,6 +108,7 @@ struct coordSorter{
 
 RawivImage pickBoneVoxels(RawivImage const &img, CoordSet coordsToPick){
   RawivImage output = RawivImage(img);
+  constexpr float fillValue = -1000; //The fill value for zeroed voxels
 
   // Convert coordset to a vector and then sort for better cache locality.
   vector<Coord> coordList = vector<Coord>();
@@ -116,11 +119,6 @@ RawivImage pickBoneVoxels(RawivImage const &img, CoordSet coordsToPick){
   coordSorter myCoordSorter;
   std::sort(coordList.begin(), coordList.end(), myCoordSorter);
 
-  //DEBUG
-  for(auto const& elem : coordList){
-    std::cout << elem << std::endl;
-  }
-
   // Iterate through list, zeroing nonmatching voxels
   auto iter = coordList.begin();
   for(size_t k = 0; k < img.dim.z; k++){
@@ -129,7 +127,7 @@ RawivImage pickBoneVoxels(RawivImage const &img, CoordSet coordsToPick){
         if (i == iter->x && j == iter->y && k == iter->z){
           iter++; //Skip this voxel and leave it at its original value
         }
-        else{ output(i,j,k) = 0; }
+        else{ output(i,j,k) = fillValue; }
       }
     }
   }
