@@ -1,5 +1,10 @@
 import sys
 
+# Print usage if not enough args
+if len(sys.argv) < 3:
+    print "usage: " + sys.argv[0] + " <input.ax> <output.off>"
+    sys.exit()
+
 inf = open(sys.argv[1], "r")
 
 v_count = 0
@@ -9,20 +14,15 @@ inf.close()
 vertices = []
 faces = []
 
-print("finished reading file! has line count ", len(all_lines))
-
 line_idx = 0
 while line_idx < len(all_lines):
   line = all_lines[line_idx]
-  print("Checking line at ", line)
 
   if line[0] == "#":
-    print("Ignoring comment...")
     line_idx += 1
     continue
 
   if line[0:4] == "{OFF":
-    print("found OFF at idx ", line_idx)
     line_idx += 1
     #numbers_str = inf.readline()
     numbers = all_lines[line_idx].split()

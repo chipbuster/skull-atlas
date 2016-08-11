@@ -15,8 +15,16 @@ add_executable(inr2mc minecraft_surf.cpp)
 target_link_libraries(inr2mc ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES})
 install (TARGETS inr2mc DESTINATION bin)
 
+# This will convert a surface to the broken-apart-objects format for use in the
+# GVD approach. We actually don't need it anymore.
+add_executable(surf2medax surface_medax.cpp)
+target_link_libraries(surf2medax ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES})
+install (TARGETS surf2medax DESTINATION bin)
+
+
 # Segment library uses libigl. Findlibigl is in cmake dir
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+
 # Can use libigl found at /net/electron/workspace/nclement/software/libigl/build
 # or download using:  git clone --recursive https://github.com/libigl/libigl.git
 find_package(libigl REQUIRED)
@@ -86,4 +94,13 @@ if (LIBIGL_FOUND)
     ${LIBIGL_LIBRARIES}
     ${LIBIGL_EXTRA_LIBRARIES})
   install (TARGETS precurate DESTINATION bin)
+
+  # This will convert a non-triangular .off file to a triangular .off file.
+  add_executable(triangular_mesh triangular_mesh.cpp)
+  target_link_libraries(triangular_mesh 
+    ${CGAL_LIBRARIES} 
+    ${CGAL_3RD_PARTY_LIBRARIES}
+    ${LIBIGL_LIBRARIES}
+    ${LIBIGL_EXTRA_LIBRARIES})
+  install (TARGETS triangular_mesh DESTINATION bin)
 endif(LIBIGL_FOUND)
