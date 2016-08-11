@@ -16,15 +16,26 @@ typedef RawivUtil::Point3<uint32_t> Coord;
 typedef unordered_set<Coord> CoordSet;
 typedef queue<Coord> CoordQ;
 
-/* When trying to extract voxelized skulls, we run into the issue that 
+/* When trying to extract voxelized skulls, we run into the issue that we cannot
+   do naive thresholding. This is because some bone structures are so thin that
+   their CT signature is closer to that of muscle than bone. We can set the
+   threshold lower, but this picks up on undesirable junk in the brain and throat.
 
+   The solution is to use a lower threshold, but to only select voxels that are
+   adjacent to known bone voxels. This way, tissue that is not attached to
+   bone (e.g. brain/eye lens) is not included in the voxel representation, but
+   tissue that has similar density and is attached to bone (e.g. orbital lamina)
+   are slightly more attached.
 
+   To do this, we assume a graph-representation: every voxel is assume to be
+   a node in a graph and adjacent to its L-inf neighbors. We then start with the
+   nodes that are known to be above the seed threshold, then BFS for all connected
+   voxels that are above the second threshold. Continue until no new bone voxels
+   can be added.
 
-
-
-
-
-
+   Note 8/11/2016: there may be a subtle bug in this algorithm: some voxels of the
+   orbital lamina of the ethmoid are not being added properly even though
+   DICOM viewers indicate that they should be added.
 
  */
 

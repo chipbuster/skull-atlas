@@ -217,7 +217,7 @@ float RawivImage::bytesToFloat(uint32_t byte){
   /* Reinterpret-casting this breaks strict type punning. Instead, use
      the mempcy trick to convert types. */
 
-  static_assert(sizeof(float)==sizeof(uint32_t));
+  static_assert(sizeof(float)==sizeof(uint32_t), "Float is not 32 bytes! Are you sure this system is IEEE 754-compliant?");
   uint32_t tmp = be32toh(byte);
   float f;
   memcpy(&f, &tmp, sizeof(float));
