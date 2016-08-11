@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <string>
+#include <cstring>
 #include <algorithm>
 
 #include <unordered_set>
@@ -15,7 +16,17 @@ typedef RawivUtil::Point3<uint32_t> Coord;
 typedef unordered_set<Coord> CoordSet;
 typedef queue<Coord> CoordQ;
 
-/* TODO: Write good docs (Ha!) */
+/* When trying to extract voxelized skulls, we run into the issue that 
+
+
+
+
+
+
+
+
+
+ */
 
 /* Initializes the voxel set we start searching from */
 void initKnownVoxels(CoordSet &knownVoxels, RawivImage const &img, int threshold){
@@ -137,12 +148,31 @@ RawivImage pickBoneVoxels(RawivImage const &img, CoordSet coordsToPick){
 
 int main(int argc, char* argv[]){
 
-  //TODO: Write error handling code for arugments
+  if (argc == 2 && strcmp(argv[1], "--help") == 0){
+    cout << "Skull Growth Program: " << endl;
+    cout << "\t Grows a rasterized representation of a skull by first selecting" << endl;
+    cout << "\t a set of known bone voxels (set with the seed_threshold) and then " << endl;
+    cout << "\t declaring that a voxel that is adjacent to a known bone voxel" << endl;
+    cout << "\t and above the bone threshold to be a known bone voxel. This continues" << endl;
+    cout << "\t until no new bone voxels can be found." << endl << endl;
 
-  string filename = string(argv[1]);
-  int initThreshold = atof(argv[2]);
-  int lowThreshold = atof(argv[3]);
-  RawivImage img = RawivImage(filename);
+    cout << "See comments at the top of growskull.cpp for more details." << endl << endl;
+
+    cout << "Usage: " << argv[0] << " input_rawiv output_rawiv seed_threshold bone_threshold" << endl;
+
+    return 1;
+  }
+  if (argc != 5){
+    cout << "Usage: " << argv[0] << " input_rawiv output_rawiv seed_threshold bone_threshold" << endl;
+    cout << endl << "Run " << argv[0] << " --help for more information" << endl;
+    return 1;
+  }
+
+  string inFilename = string(argv[1]);
+  string outFilename = string(argv[2]);
+  int initThreshold = atof(argv[3]);
+  int lowThreshold = atof(argv[4]);
+  RawivImage img = RawivImage(inFilename);
   CoordSet knownVoxels = CoordSet();
   CoordQ activeVoxels; //Used for voxels that have been discovered but not BFSed
 
@@ -156,7 +186,7 @@ int main(int argc, char* argv[]){
 
   RawivImage output = pickBoneVoxels(img, knownVoxels);
 
-  output.writeToFile("test.rawiv");
+  output.writeToFile(outFilename);
 
   return 0;
 

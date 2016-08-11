@@ -1,5 +1,3 @@
-project(skull-raster)
-
 include_directories(../rawivutil)
 
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -g -O1")
