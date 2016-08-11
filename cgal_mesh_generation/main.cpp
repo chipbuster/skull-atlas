@@ -47,6 +47,7 @@ int main(int argc, char* argv[]) {
 
   {
     ofstream fout(output_mesh_filename);
+    fout.precision(9);
     print_polyhedron_wavefront(fout, mesh);
   }
 
