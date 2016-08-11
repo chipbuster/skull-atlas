@@ -18,8 +18,9 @@ The target directory structure is as follows:
 * A top-level directory that is named with the identifier ($NUMID)
    * A directory named `DICOMOBJ` that contains the DICOM data as given to us by DCMCCT
    * A directory named `DICOMUNC` that contains the uncompressed DICOM images (for use by PyDICOM)
-   * A directory named `VOLIMG` that contains the volumetric images (e.g. rawiv/inr)
    * A directory named `METADATA` that contains the processed and raw metadata
+   * A directory named `VOLIMG`   that contains the volumetric images (e.g. rawiv/inr)
+   * A directory named `MESHES`   that contains geometry files (e.g. obj/raw/off)
 
    TENTATIVE SUGGESTIONS:
    - A directory named PIPELINE that holds temporary files used by the processing pipeline
