@@ -135,6 +135,7 @@ if [ -d "$NUMID/DICOMOBJ" ]; then
   mkdir "$NUMID"/VOLIMG         # For volumetric images
   mkdir "$NUMID"/METADATA       # For metadata dumps
   mkdir "$NUMID"/DICOMUNC       # For uncompressed DICOM images
+  mkdir "$NUMID"/MESHES         # For geometry files
   echo "$DIR/$NUMID" >> "$DIRDIR_FILE" # Add this folder to the data folder list
 
   # Move the directories to the right location and clean the temp
