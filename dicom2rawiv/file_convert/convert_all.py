@@ -119,6 +119,7 @@ def main(path):
 
     datadirs = []
 
+    ## Generate the argument list
     for base, dirlist, filelist in os.walk(path):
         if "DICOMUNC" in dirlist and "VOLIMG" in dirlist:
             patient_id = base.split('/')[-1]
@@ -129,6 +130,11 @@ def main(path):
     ncpu = multiprocessing.cpu_count()
     pool = multiprocessing.Pool(processes=8)
 
+    ## Serial:
+    # for arg in datadirs:
+    #    patient_dicom_to_rawiv(arg)
+
+    ## Parallel
     pool.map(patient_dicom_to_rawiv, datadirs, chunksize=1)
 
 if __name__ == '__main__':
