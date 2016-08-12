@@ -103,4 +103,13 @@ if (LIBIGL_FOUND)
     ${LIBIGL_LIBRARIES}
     ${LIBIGL_EXTRA_LIBRARIES})
   install (TARGETS triangular_mesh DESTINATION bin)
+  
+  # Extracts components from a mesh (will do it visually)
+  add_executable(select_components select_components.cpp ${LIBIGL_EXTRA_SOURCES})
+  target_link_libraries(select_components 
+    ${CGAL_LIBRARIES} 
+    ${CGAL_3RD_PARTY_LIBRARIES}
+    ${LIBIGL_LIBRARIES}
+    ${LIBIGL_EXTRA_LIBRARIES})
+  install (TARGETS segment DESTINATION bin)
 endif(LIBIGL_FOUND)
