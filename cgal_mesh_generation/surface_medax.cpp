@@ -31,6 +31,86 @@ void coords(const Vector_3 &p, double &azimuth, double &polar) {
   azimuth = CGAL::to_double(atan2(p.y(), p.x()));
 }
 
+int getCoordsDodecahedron(const Vector_3 &norm) {
+  // Normalize this point.
+  Vector_3 n_norm = norm;
+  n_norm = n_norm / CGAL::sqrt(n_norm.squared_length());
+
+  // Calculate the 12 vertices of the icosahedron.
+  Vector_3 verts[12];
+  verts[0]  = Vector_3( 2,  1, 0);
+  verts[1]  = Vector_3( 2, -1, 0);
+  verts[2]  = Vector_3(-2,  1, 0);
+  verts[3]  = Vector_3(-2, -1, 0);
+
+  verts[4]  = Vector_3( 1, 0,  2);
+  verts[5]  = Vector_3( 1, 0, -2);
+  verts[6]  = Vector_3(-1, 0,  2);
+  verts[7]  = Vector_3(-1, 0, -2);
+
+  verts[8 ] = Vector_3(0,  2,  1);
+  verts[9 ] = Vector_3(0,  2, -1);
+  verts[10] = Vector_3(0, -2,  1);
+  verts[11] = Vector_3(0, -2, -1);
+  
+  // Calculate the closest point.
+  int max_p = 0;
+  for (int i = 0; i < 20; ++i) {
+    double dot_prod = CGAL::to_double(n_norm * verts[i]);
+    if (dot_prod > CGAL::to_double(n_norm * verts[max_p])) {
+      max_p = i;
+    }
+  }
+
+  return max_p;
+}
+
+int getCoordsIcosahedral(const Vector_3 &norm) {
+  double h = (sqrt(5) - 1.0)/2.0;
+  double h2 = pow(h, 2.0);
+
+  // Normalize this point.
+  Vector_3 n_norm = norm;
+  n_norm = n_norm / CGAL::sqrt(n_norm.squared_length());
+
+  // Calculate the 20 vertices of the dual dodecahedron.
+  Vector_3 verts[20];
+  verts[0]  = Vector_3(0,  (1.0 + h),  (1.0 - h2));
+  verts[1]  = Vector_3(0,  (1.0 + h), -(1.0 - h2));
+  verts[2]  = Vector_3(0, -(1.0 + h),  (1.0 - h2));
+  verts[3]  = Vector_3(0, -(1.0 + h), -(1.0 - h2));
+
+  verts[4]  = Vector_3( (1 + h),  (1 - h2), 0);
+  verts[5]  = Vector_3( (1 + h), -(1 - h2), 0);
+  verts[6]  = Vector_3(-(1 + h),  (1 - h2), 0);
+  verts[7]  = Vector_3(-(1 + h), -(1 - h2), 0);
+
+  verts[8]  = Vector_3( (1 - h2), 0,  (1 + h));
+  verts[9]  = Vector_3( (1 - h2), 0, -(1 + h));
+  verts[10] = Vector_3(-(1 - h2), 0,  (1 + h));
+  verts[11] = Vector_3(-(1 - h2), 0, -(1 + h));
+
+  verts[12] = Vector_3( 1,  1,  1);
+  verts[13] = Vector_3( 1,  1, -1);
+  verts[14] = Vector_3( 1, -1,  1);
+  verts[15] = Vector_3( 1, -1, -1);
+  verts[16] = Vector_3(-1,  1,  1);
+  verts[17] = Vector_3(-1,  1, -1);
+  verts[18] = Vector_3(-1, -1,  1);
+  verts[19] = Vector_3(-1, -1, -1);
+
+  // Calculate the closest point.
+  int max_p = 0;
+  for (int i = 0; i < 20; ++i) {
+    double dot_prod = CGAL::to_double(n_norm * verts[i]);
+    if (dot_prod > CGAL::to_double(n_norm * verts[max_p])) {
+      max_p = i;
+    }
+  }
+
+  return max_p;
+}
+
 /**
  * From a azimuth and polar coordinate, returns the int this belongs to.
  * The azimuth-polar grid is broken into az_split and pol_split segments.
@@ -276,7 +356,9 @@ int main(int argc, char* argv[]) {
     double a, p;
     coords(v, a,p);
 
-    int obj_idx = getCoordsIdx(a,p, num_splits,num_splits);
+    //int obj_idx = getCoordsIdx(a,p, num_splits,num_splits);
+    //int obj_idx = getCoordsIcosahedral(v);
+    int obj_idx = getCoordsDodecahedron(v);
     Tri t(p1, p2, p3);
     facet_ids[t] = obj_idx;
     point_ids[p1].push_back(obj_idx);
@@ -310,9 +392,9 @@ int main(int argc, char* argv[]) {
 
     int cur_id = f.second;
     // If only three indices belong to this facet, it's an island. Remove it.
-    if (counts[cur_id] == 3) {
-      //fprintf(stderr, "Changing from %d to %d, because max %d counts %d\n",
-      //        facet_ids.at(f.first), max_id, counts[max_id], all_ids.size());
+    if (counts[cur_id] <= 3) {
+      fprintf(stderr, "Changing from %d to %d, because max %d counts %d\n",
+              facet_ids.at(f.first), max_id, counts[max_id], all_ids.size());
       facet_ids.at(f.first) = max_id;
     }
   }
