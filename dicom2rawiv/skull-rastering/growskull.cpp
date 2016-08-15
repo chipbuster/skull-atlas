@@ -61,11 +61,11 @@ inline bool isIn(Coord toTest,CoordSet const &known){
    the valid neighbors of the input coordinate */
 CoordSet getNeighbors(Coord inp, Coord boundaries){
   CoordSet neighbors = CoordSet();
-  constexpr unsigned int radius = 2; // How many voxels to each side do we define as a "neighbor"
+  constexpr int radius = 2; // How many voxels to each side do we define as a "neighbor"
 
-  for(auto i = -2; i <= 2; i++){
-    for(auto j = -2; j <= 2; j++){
-      for(auto k = -2; k <= 2; k++){
+  for(int i = -radius; i <= radius; i++){
+    for(int j = -radius; j <= radius; j++){
+      for(int k = -radius; k <= radius; k++){
         size_t x = inp.x + i;
         size_t y = inp.y + j;
         size_t z = inp.z + k;
@@ -93,8 +93,8 @@ void runBFS(CoordSet &known, CoordQ &active, Coord maxDim, RawivImage const &img
 
     ctr--;
     if (ctr == 0){
-    cout << "Active Voxel Count (program will finish when this reaches zero): " << active.size() << endl;
     ctr = 50000;
+    cout << "AVC: " << active.size() << endl;
     }
 
     CoordSet currNeighbors = getNeighbors(current, maxDim);
@@ -147,6 +147,7 @@ RawivImage pickBoneVoxels(RawivImage const &img, CoordSet coordsToPick){
     for(size_t j = 0; j < img.dim.y; j++){
       for(size_t i = 0; i < img.dim.x; i++){
         if (i == iter->x && j == iter->y && k == iter->z){
+          output(i,j,k) = 2000;
           iter++; //Skip this voxel and leave it at its original value
         }
         else{ output(i,j,k) = fillValue; }
@@ -169,20 +170,44 @@ int main(int argc, char* argv[]){
 
     cout << "See comments at the top of growskull.cpp for more details." << endl << endl;
 
-    cout << "Usage: " << argv[0] << " input_rawiv output_rawiv seed_threshold bone_threshold" << endl;
+    cout << "Usage: " << argv[0] << " input_rawiv output_rawiv seed_threshold bone_threshold" << endl << endl;
+    cout << "Alt Usage: " << argv[0] << " input_rawiv seed_threshold bone_threshold" << endl;
+    cout << "(Output will be input filename with '_filtered' appended)" << endl;
+
 
     return 1;
   }
-  if (argc != 5){
+
+  if (argc != 5 && argc != 4){
     cout << "Usage: " << argv[0] << " input_rawiv output_rawiv seed_threshold bone_threshold" << endl;
     cout << endl << "Run " << argv[0] << " --help for more information" << endl;
     return 1;
   }
 
-  string inFilename = string(argv[1]);
-  string outFilename = string(argv[2]);
-  int initThreshold = atof(argv[3]);
-  int lowThreshold = atof(argv[4]);
+  string inFilename, outFilename;
+  int initThreshold, lowThreshold;
+
+  if (argc == 5){
+    inFilename = string(argv[1]);
+    outFilename = string(argv[2]);
+    initThreshold = atoi(argv[3]);
+    lowThreshold = atoi(argv[4]);
+  }
+  else if (argc == 4){
+    inFilename = string(argv[1]);
+
+    // Calculate output filename based on input
+
+    size_t lastindex = inFilename.find_last_of(".");
+    string rawname = inFilename.substr(0,lastindex);
+    outFilename = rawname + "_filtered.rawiv";
+
+    initThreshold = atoi(argv[2]);
+    lowThreshold = atoi(argv[3]);
+  }else{
+    return -1; // Keep compiler from warning about uninit'd vals
+  }
+
   RawivImage img = RawivImage(inFilename);
   CoordSet knownVoxels = CoordSet();
   CoordQ activeVoxels; //Used for voxels that have been discovered but not BFSed
@@ -192,6 +217,8 @@ int main(int argc, char* argv[]){
   for(const auto elem : knownVoxels){
     activeVoxels.push(elem);
   }
+
+  cout << "Program will terminate when AVC (active voxel count) reaches zero." << endl;
 
   runBFS(knownVoxels, activeVoxels, img.dim, img, lowThreshold);
 
