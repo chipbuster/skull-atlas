@@ -142,7 +142,7 @@ struct Tri {
   }
 };
 
-struct OBJ {
+class OBJ {
  private:
   int max_three(const int &a, const int &b, const int &c) const {
     return std::max(a, std::max(b, c));
@@ -242,6 +242,7 @@ struct OBJ {
     }
     _facets.push_back(facet);
   }
+ 
 
   void write_obj(const char* fn_pre) const {
 
@@ -250,49 +251,60 @@ struct OBJ {
     int num_comps = flood_fill(f_ids, v_ids);
     printf("  Number of components is: %d\n", num_comps);
 
-    int f_count = 0;
-    // Write a separate file for each component.
+    OBJ* sub_objs = new OBJ[num_comps];
+
+    // Loop over each face.
+    for (int i = 0; i < _facets.size(); ++i) {
+      // Add a new facet to this object.
+      std::vector<Point_3> facet;
+      for (int j = 0; j < _facets[i].size(); ++j) {
+        facet.push_back(_verts_linear[_facets[i][j] - 1]); // 1-based
+      }
+
+      sub_objs[f_ids[i]].insert_facet(facet);
+    }
+    
+    // Then, write them all out to their respective objects.
     for (int i = 0; i < num_comps; ++i) {
-      char* fn = new char[strlen(fn_pre) + 10];
+      char* fn = new char[strlen(fn_pre) + 16];
       sprintf(fn, "%s_%d.obj", fn_pre, i);
 
-      FILE *ofs = fopen(fn, "w");
-      if (!ofs) {
-        perror("could not open file!");
-        return;
-      }
+      sub_objs[i]._write_obj_single(fn);
 
-      std::map<int, int> new_id;
-      // Needs to start at index 1
-      int id_count = 1;
-      for (int j = 0; j < _verts_linear.size(); ++j) {
-        new_id[j] = id_count++;
-
-        const Point_3 &p = _verts_linear[j];
-        double x = CGAL::to_double(p.x());
-        double y = CGAL::to_double(p.y());
-        double z = CGAL::to_double(p.z());
-        fprintf(ofs, "v %f %f %f\n", x,y,z);
-      }
-      for (int j = 0; j < _facets.size(); ++j) {
-        // ignore this facet if it's not actually part of this object.
-        if (f_ids[j] != i) continue;
-    
-        f_count++;
-        // Otherwise, print out the facet.
-        const auto &f = _facets[j];
-        fprintf(ofs, "f");
-        for (int f_i : f) {
-          //fprintf(ofs, " %d", new_id[f_i]);
-          fprintf(ofs, " %d", f_i);
-        }
-        fprintf(ofs, "\n");
-      }
-      fclose(ofs);
-      delete fn;
+      delete[] fn;
     }
 
-    printf("  printed %d of %d facets\n", f_count, _facets.size());
+    delete[] sub_objs;
+  }
+
+ private:
+  void _write_obj_single(const char* fn) const {
+
+    FILE *ofs = fopen(fn, "w");
+    if (!ofs) {
+      perror("could not open file!");
+      return;
+    }
+
+    // Needs to start at index 1
+    int id_count = 1;
+    for (int j = 0; j < _verts_linear.size(); ++j) {
+      const Point_3 &p = _verts_linear[j];
+      double x = CGAL::to_double(p.x());
+      double y = CGAL::to_double(p.y());
+      double z = CGAL::to_double(p.z());
+      fprintf(ofs, "v %f %f %f\n", x,y,z);
+    }
+    for (int j = 0; j < _facets.size(); ++j) {
+      const auto &f = _facets[j];
+      fprintf(ofs, "f");
+      for (int f_i : f) {
+        //fprintf(ofs, " %d", new_id[f_i]);
+        fprintf(ofs, " %d", f_i);
+      }
+      fprintf(ofs, "\n");
+    }
+    fclose(ofs);
   }
 
 
@@ -357,8 +369,8 @@ int main(int argc, char* argv[]) {
     coords(v, a,p);
 
     //int obj_idx = getCoordsIdx(a,p, num_splits,num_splits);
-    //int obj_idx = getCoordsIcosahedral(v);
-    int obj_idx = getCoordsDodecahedron(v);
+    int obj_idx = getCoordsIcosahedral(v);
+    //int obj_idx = getCoordsDodecahedron(v);
     Tri t(p1, p2, p3);
     facet_ids[t] = obj_idx;
     point_ids[p1].push_back(obj_idx);
@@ -366,6 +378,7 @@ int main(int argc, char* argv[]) {
     point_ids[p3].push_back(obj_idx);
   }
 
+  int num_islands = 0;
   // Look for island facets, and remove them.
   for (const auto& f : facet_ids) {
     std::vector<int> all_ids;
@@ -393,12 +406,13 @@ int main(int argc, char* argv[]) {
     int cur_id = f.second;
     // If only three indices belong to this facet, it's an island. Remove it.
     if (counts[cur_id] <= 3) {
-      fprintf(stderr, "Changing from %d to %d, because max %d counts %d\n",
-              facet_ids.at(f.first), max_id, counts[max_id], all_ids.size());
+      //fprintf(stderr, "Changing from %d to %d, because max %d counts %d\n",
+      //        facet_ids.at(f.first), max_id, counts[max_id], all_ids.size());
+      num_islands++;
       facet_ids.at(f.first) = max_id;
     }
   }
-
+  printf("Removed %d islands\n", num_islands);
 
 
   std::map<int, OBJ> objs;
