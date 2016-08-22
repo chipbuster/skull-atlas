@@ -4,12 +4,30 @@
 #include <map>
 #include <vector>
 
+#include <Eigen/Core>
+
 #include "igl/components.h"
 #include "igl/jet.h"
 #include "igl/polygon_mesh_to_triangle_mesh.h"
 #include "igl/readOFF.h"
 #include "igl/viewer/Viewer.h"
 #include "igl/writeOFF.h"
+
+double volume(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F) {
+
+  double total_det = 0;
+
+  for (int i = 0; i < F.rows(); ++i) {
+    Eigen::Matrix3d p;
+    p << V(F(i, 0), 0), V(F(i, 1), 0), V(F(i, 2), 0),
+         V(F(i, 0), 1), V(F(i, 1), 1), V(F(i, 2), 1),
+         V(F(i, 0), 2), V(F(i, 1), 2), V(F(i, 2), 2);
+
+    total_det += p.determinant();
+  }
+
+  return std::abs(total_det / 6.0);
+}
 
 void selectValidVerts(const Eigen::MatrixXd &Vi, const Eigen::MatrixXi &Fi,
                       const Eigen::VectorXi &Ci, int comp_num,
@@ -149,6 +167,9 @@ int main(int argc, char* argv[]) {
           component_num = std::max(component_num, 0);
         }
         selectValidVerts(Vi,Fi,Comps, component_num, Vo,Fo);
+        double comp_vol = volume(Vo,Fo);
+        printf("Selecting component %d with volume %lf. Press 'X' to delete, ' ' to include\n",
+               component_num, comp_vol);
         viewer.data.clear();
         viewer.data.set_mesh(Vo, Fo);
         return true;
@@ -175,6 +196,7 @@ int main(int argc, char* argv[]) {
         }
         printf("Writing output with %d components to %s\n", n_comps, argv[2]);
         igl::writeOFF(argv[2], Vo,Fo);
+        printf("Finished! You may close the program.\n");
       }
       return false;
     };
