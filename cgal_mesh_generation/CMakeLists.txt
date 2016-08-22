@@ -42,7 +42,7 @@ if (LIBIGL_FOUND)
   option(LIBIGL_WITH_OPENGL      "Use OpenGL"         ON)
   option(LIBIGL_WITH_GLFW        "Use GLFW"           ON)
   option(LIBIGL_WITH_BBW         "Use BBW"            OFF)
-  option(LIBIGL_WITH_EMBREE      "Use Embree"         OFF)
+  option(LIBIGL_WITH_EMBREE      "Use Embree"         ON)
   option(LIBIGL_WITH_PNG         "Use PNG"            OFF)
   option(LIBIGL_WITH_TETGEN      "Use Tetgen"         ON)
   option(LIBIGL_WITH_TRIANGLE    "Use Triangle"       ON)
@@ -111,5 +111,23 @@ if (LIBIGL_FOUND)
     ${CGAL_3RD_PARTY_LIBRARIES}
     ${LIBIGL_LIBRARIES}
     ${LIBIGL_EXTRA_LIBRARIES})
-  install (TARGETS segment DESTINATION bin)
+  install (TARGETS select_components DESTINATION bin)
+
+  # Sets points on the skull
+  add_executable(point_selector point_selector.cpp ${LIBIGL_EXTRA_SOURCES})
+  target_link_libraries(point_selector 
+    ${CGAL_LIBRARIES} 
+    ${CGAL_3RD_PARTY_LIBRARIES}
+    ${LIBIGL_LIBRARIES}
+    ${LIBIGL_EXTRA_LIBRARIES})
+  install (TARGETS point_selector DESTINATION bin)
+  
+  # Decimate mesh
+  add_executable(decimate decimate.cpp ${LIBIGL_EXTRA_SOURCES})
+  target_link_libraries(decimate 
+    ${CGAL_LIBRARIES} 
+    ${CGAL_3RD_PARTY_LIBRARIES}
+    ${LIBIGL_LIBRARIES}
+    ${LIBIGL_EXTRA_LIBRARIES})
+  install (TARGETS decimate DESTINATION bin)
 endif(LIBIGL_FOUND)
