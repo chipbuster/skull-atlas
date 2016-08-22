@@ -2,6 +2,8 @@ cmake_minimum_required (VERSION 2.8)
 
 add_subdirectory(volume_diff)
 
+add_subdirectory(medial_axis_transformation)
+
 find_package(CGAL REQUIRED COMPONENTS Core ImageIO)
 include(${CGAL_USE_FILE})
 
