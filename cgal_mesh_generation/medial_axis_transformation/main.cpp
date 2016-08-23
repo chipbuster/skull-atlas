@@ -1,6 +1,8 @@
 #include <fstream>
 
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
+#include <CGAL/Polygon_mesh_processing/orient_polygon_soup.h>
+#include <CGAL/Polygon_mesh_processing/polygon_soup_to_polygon_mesh.h>
 #include <CGAL/IO/print_wavefront.h>
 
 #include "voronoi_medial_axis.h"
@@ -8,6 +10,7 @@
 
 int main(int argc, char* argv[]) {
 
+  using ::std::vector;
   typedef ::CGAL::Exact_predicates_inexact_constructions_kernel K;
   typedef ::CGAL::Polyhedron_3<K> Polyhedron;
   typedef Polyhedron::HalfedgeDS HalfedgeDS;
@@ -28,13 +31,8 @@ int main(int argc, char* argv[]) {
   }
 
   // Computes "medialAxis" from "polyhedron".
-  Polyhedron medialAxis;
-  {
-    ::skull_atlas::VoronoiMedialAxis<K> medialAxisTransform;
-    auto triangleList = medialAxisTransform.compute(polyhedron);
-    ::skull_atlas::PolyhedronBuilder<K, HalfedgeDS> builder(triangleList);
-    medialAxis.delegate(builder);
-  }
+  ::skull_atlas::VoronoiMedialAxis medialAxisTransform;
+  Polyhedron medialAxis = medialAxisTransform.compute(polyhedron);
 
   // Writes "medialAxis" to "outputMeshFilename".
   {
