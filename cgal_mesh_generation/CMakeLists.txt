@@ -2,8 +2,6 @@ cmake_minimum_required (VERSION 2.8)
 
 add_subdirectory(volume_diff)
 
-add_subdirectory(medial_axis_transformation)
-
 find_package(CGAL REQUIRED COMPONENTS Core ImageIO)
 include(${CGAL_USE_FILE})
 
@@ -132,4 +130,14 @@ if (LIBIGL_FOUND)
     ${LIBIGL_LIBRARIES}
     ${LIBIGL_EXTRA_LIBRARIES})
   install (TARGETS decimate DESTINATION bin)
+
+  # Color the mesh by the curvature values
+  add_executable(color_curvature color_curvature.cpp ${LIBIGL_EXTRA_SOURCES})
+  target_link_libraries(color_curvature 
+    ${CGAL_LIBRARIES} 
+    ${CGAL_3RD_PARTY_LIBRARIES}
+    ${LIBIGL_LIBRARIES}
+    ${LIBIGL_EXTRA_LIBRARIES})
+  install (TARGETS color_curvature DESTINATION bin)
+
 endif(LIBIGL_FOUND)
