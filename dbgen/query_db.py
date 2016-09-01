@@ -4,6 +4,7 @@ import sys
 import os
 import csv
 import cursesmenu as cm
+import subprocess
 
 def get_filepath_from_ids(id_tuple, basepath):
     """Gets the path to a file with the given (patientID, seriesID) tuple from the base path"""
@@ -11,7 +12,10 @@ def get_filepath_from_ids(id_tuple, basepath):
 
     for (root,dirs,files) in os.walk(basepath):
         if pid in dirs:
-            return os.path.join(root,pid,"MESHES",series+".obj")
+            path1 = os.path.join(root,pid)
+            for (root2, dirs2, files2) in os.walk(path1):
+                if series + ".obj" in files2:
+                    return os.path.join(path1,root2,series+".obj")
 
     return None
 
@@ -42,7 +46,7 @@ serieslist = [ str(series) for (series,) in serieslist_Raw ]
 if not serieslist:
     raise ValueError("Patient " + patient + " has no associated CT Scans!")
 
-cm.clear_terminal()
+print(chr(27) + "[2J")
 selectionNum = cm.SelectionMenu.get_selection(serieslist,
                                               title="We found the following series for patient %s"%(patient),
                                               subtitle="Which one do you want to query for similarity?")
@@ -78,5 +82,12 @@ selectionNum = cm.SelectionMenu.get_selection(matchstrings,
 patientPath = get_filepath_from_ids((patient,targetSeries), datapath)
 targetPath = get_filepath_from_ids((targetpid,targetsid), datapath)
 
-print(patientPath)
-print(targetPath)
+if patientPath != None:
+    p1 = subprocess.Popen(["meshlab", patientPath])
+if targetPath != None:
+    p2 = subprocess.Popen(["meshlab", targetPath])
+
+p1.wait()
+p2.wait()
+
+
