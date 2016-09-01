@@ -106,7 +106,10 @@ print("Please wait, preparing meshes for viewing...")
 obj2off = add_trailing_slash(scriptpath) + "obj2off.sh"
 offcomb = add_trailing_slash(scriptpath) + "combineOff.pl"
 aligntool = "/mnt/spinny/CVC/skull-atlas/libicp/build/icp"
+decimatetool = "meshlabserver"
 viewer  = "meshlab"
+rawPatientMesh = "patientmesh_raw.off"
+rawTargetMesh = "targetmesh_raw.off"
 patientMesh = "patient.off"
 targetMesh = "target.off"
 alignedTargetMesh = "target_aligned.off"
@@ -118,8 +121,13 @@ if not os.path.isfile(aligntool):
 print("-- Converting patient meshes to OFF format")
 
 # Change both meshes from obj to off meshes, storing in current dir
-p1 = subprocess.call([obj2off, patientObj, patientMesh])
-p2 = subprocess.call([obj2off, targetObj, targetMesh])
+p1 = subprocess.call([obj2off, patientObj, rawPatientMesh])
+p2 = subprocess.call([obj2off, targetObj, rawTargetMesh])
+
+print("-- Decimating meshes")
+
+p11 = subprocess.call([decimatetool, '-s', 'decimate.mlx', '-i', rawPatientMesh, '-o', patientMesh])
+p12 = subprocess.call([decimatetool, '-s', 'decimate.mlx', '-i', rawTargetMesh, '-o', targetMesh])
 
 print ("-- Aligning meshes with libICP (you may see some output on the screen at this point)")
 

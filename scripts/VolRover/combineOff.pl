@@ -12,8 +12,8 @@ open(my $INP1, "<", $inp1) or die "Could not open input [$inp1]: $!\n";
 open(my $INP2, "<", $inp2) or die "Could not open input [$inp2]: $!\n";
 open(my $OUTP, ">", $outp) or die "Could not open input [$outp]: $!\n";
 
-my $col1 = "" . int(rand(255)) . " " . int(rand(255)) . " " . int(rand(255));
-my $col2 = "" . int(rand(255)) . " " . int(rand(255)) . " " . int(rand(255));
+my $col1 = "255 0 0 0";
+my $col2 = "0 0 255 0";
 
 # Get number of faces for first
 my $h1 = <$INP1>; #ignore the OFF line
@@ -38,13 +38,13 @@ print $OUTP "$nv $nf 0\n"; # Ignore edges
 for my $i (1..$nv1) {
   my $line = <$INP1>;
   chomp $line;
-  print $OUTP "$line 0 $col1\n";
+  print $OUTP "$line $col1\n";
 }
 # Print all the vertices from 2
 for my $i (1..$nv2) {
   my $line = <$INP2>;
   chomp $line;
-  print $OUTP "$line 0 $col2\n";
+  print $OUTP "$line $col2\n";
 }
 # Print all the faces for each.
 while(<$INP1>) {
