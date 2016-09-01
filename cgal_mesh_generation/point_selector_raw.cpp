@@ -109,9 +109,14 @@ int main(int argc, char* argv[]) {
   if (argc < 3) {
     fprintf(stderr, "Used for selecting points on the surface of a mesh. Will write the\n"
                     "corresponding vertices to output.off\n");
-    fprintf(stderr, "usage: %s <input.off> <output.off> [decimate perc]\n",
+    fprintf(stderr, "usage: %s <input.off> <output.off> [nowrite]\n",
             argv[0]);
     return -1;
+  }
+
+  bool writeable = true;
+  if (argc == 4) {
+    writeable = false;
   }
 
   Eigen::MatrixXd V,V2;
@@ -122,18 +127,6 @@ int main(int argc, char* argv[]) {
   // Read in the input file.
   igl::readOFF(argv[1], V, F);
   
-  if (argc == 4) {
-    float dec_perc = atof(argv[3]);
-    int new_faces = dec_perc * F.rows();
-    printf("Decimating by %f to %d faces...\n", dec_perc, new_faces);
-    // First things first: decimate the mesh
-    Eigen::VectorXi J;
-    igl::decimate(V,F, new_faces, V2,F2,J);
-    printf("Decimated from V:%d,F:%d to V:%d,F:%d\n",
-           V.rows(), F.rows(), V2.rows(), F2.rows());
-    V = V2; F = F2;
-  }
-
   // Colors are all white to start.
   Eigen::MatrixXd VC = Eigen::MatrixXd::Constant(V.rows(),3,1);
   // Initialize this thing so we can get the vertices.
@@ -271,6 +264,9 @@ int main(int argc, char* argv[]) {
         break;
       case 'W':
       {
+        if (!writeable) {
+          return false;
+        }
         printf("Writing output to %s\n", argv[2]);
         // Write to output file
         FILE* ofs = fopen(argv[2], "w");
@@ -299,6 +295,9 @@ int main(int argc, char* argv[]) {
   viewer.callback_mouse_down = 
       [&](igl::viewer::Viewer &viewer, int, int)->bool
       {
+        if (!writeable) {
+          return false;
+        }
         // fid will be the face ID. Need to get the vertex ID
         int fid, vid;
         // Cast a ray in the view direction starting from the mouse position
