@@ -121,6 +121,14 @@ if (LIBIGL_FOUND)
     ${LIBIGL_LIBRARIES}
     ${LIBIGL_EXTRA_LIBRARIES})
   install (TARGETS point_selector DESTINATION bin)
+  # Sets points on the skull
+  add_executable(point_selector_raw point_selector_raw.cpp ${LIBIGL_EXTRA_SOURCES})
+  target_link_libraries(point_selector_raw 
+    ${CGAL_LIBRARIES} 
+    ${CGAL_3RD_PARTY_LIBRARIES}
+    ${LIBIGL_LIBRARIES}
+    ${LIBIGL_EXTRA_LIBRARIES})
+  install (TARGETS point_selector_raw DESTINATION bin)
   
   # Decimate mesh
   add_executable(decimate decimate.cpp ${LIBIGL_EXTRA_SOURCES})
@@ -140,4 +148,14 @@ if (LIBIGL_FOUND)
     ${LIBIGL_EXTRA_LIBRARIES})
   install (TARGETS color_curvature DESTINATION bin)
 
+  # Distance between two meshes
+  add_executable(distMeshMesh distMeshMesh.cpp ${LIBIGL_EXTRA_SOURCES})
+  target_link_libraries(distMeshMesh 
+    ${CGAL_LIBRARIES} 
+    ${CGAL_3RD_PARTY_LIBRARIES}
+    ${LIBIGL_LIBRARIES}
+    ${LIBIGL_EXTRA_LIBRARIES})
+  install (TARGETS distMeshMesh DESTINATION bin)
+
 endif(LIBIGL_FOUND)
+
