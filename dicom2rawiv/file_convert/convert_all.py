@@ -36,7 +36,7 @@ import rawivutil
 import multiprocessing
 from slices2rawiv import *
 
-def patient_dicom_to_rawiv(inp_tuple):
+def patient_dicom_to_imgs(inp_tuple):
     # Input comes as a tuple for easier compat with multiprocessing
     # Need to unpack this tuple before proceeding
     (path,patient_id) = inp_tuple
@@ -135,7 +135,7 @@ def main(path):
     #    patient_dicom_to_rawiv(arg)
 
     ## Parallel
-    pool.map(patient_dicom_to_rawiv, datadirs, chunksize=1)
+    pool.map(patient_dicom_to_imgs, datadirs, chunksize=1)
 
 if __name__ == '__main__':
     main(sys.argv[1])
