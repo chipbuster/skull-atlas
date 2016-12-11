@@ -1,6 +1,6 @@
 project(growskull)
 
-include_directories(../rawivutil)
+include_directories(../imgutil)
 
 set(CMAKE_CXX_STANDARD 11)
 
