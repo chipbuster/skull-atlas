@@ -33,6 +33,8 @@ import dicom
 
 import dicomutil
 import rawivutil
+import inrutil
+import niftiutil
 import multiprocessing
 from slices2rawiv import *
 
@@ -79,10 +81,14 @@ def patient_dicom_to_imgs(inp_tuple):
         series_mdata['PatientID'] = patient_id #Overwrite this field -- different from our IDs
         series_mdata['CVCSeriesId'] = series_name
 
-        volfile_name = series_name + ".rawiv"
+        rawivfile_name = series_name + ".rawiv"
+        inrfile_name = series_name + ".inr"
+        niifile_name = series_name + ".nii"
         mdtfile_name = series_name + ".json"
 
-        vol_out = os.path.join(rawiv_dir, volfile_name)
+        rawiv_out = os.path.join(rawiv_dir, rawivfile_name)
+        inr_out = os.path.join(rawiv_dir, inrfile_name)
+        nii_out = os.path.join(rawiv_dir, niifile_name)
         mdt_out = os.path.join(mdata_dir, mdtfile_name)
 
         # Determine if series is aligned axially. If not, discard it.
@@ -106,8 +112,10 @@ def patient_dicom_to_imgs(inp_tuple):
         with open(mdt_out,'w') as outfile:
             json.dump(series_mdata, outfile)
 
-        # Write the image
-        rawivutil.writeRawIV(img,vol_out,(xs,ys,zs))
+        # Write the image to multiple formats
+        rawivutil.writeRawIV(img,rawiv_out,(xs,ys,zs))
+        inrutil.writeINR(img,inr_out,(xs,ys,zs))
+        niftiutil.writeNii(img,nii_out,(xs,ys,zs))
         del img
 
     print("Done processing DICOM data for patient " + patient_id)

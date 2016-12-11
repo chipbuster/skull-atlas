@@ -4,8 +4,13 @@ import numpy as np
 import struct
 import binascii
 
-def writeRawIV(data, filename, spacings):
+def writeRawIV(data, filename, spacings, ignore_ext=False):
     """Writes an array to a rawiv file specified by filename."""
+
+    if not ignore_ext:
+        if filename.split('.')[-1] != "rawiv":
+            raise ValueError("Filename extension does not match for an INR file.\
+            Call this function with ignore_ext=True to override.")
 
     assert isinstance(data, np.ndarray), "Data is not a NumPy array!"
 
