@@ -563,3 +563,5 @@ Temporary Items
 *.rawn
 *.rawnc
 **/.datadirdir
+*.inr
+*.nii

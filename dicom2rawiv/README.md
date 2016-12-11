@@ -29,9 +29,10 @@ Prerequisites are:
  
  * A C/C++/Fortran compiler
  * Python 3
- * PyDICOM
+ * [PyDICOM](http://www.pydicom.org/)
  * Numpy
  * CMake
+ * [niBabel](http://nipy.org/nibabel/)
 
 ## Quick Start
  0. Install PyDICOM and Numpy using your mechanism of choice.

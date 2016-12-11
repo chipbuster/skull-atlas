@@ -17,7 +17,7 @@ def handleTag(tag_name, tag_val, inr_obj):
         # It needs to be one of these.
         assert tag_val.lower() in {"float", "signed fixed", "unsigned fixed"}, \
             "Error!! Unrecognized value type: " + tag_val
- 
+
         inr_obj["TYPE"] = tag_val.lower()
     elif tag_name.upper() == "PIXSIZE":
         px = int(tag_val.split()[0])
@@ -36,7 +36,7 @@ def handleTag(tag_name, tag_val, inr_obj):
             inr_obj["ENDIAN"] = "big"
         else:
             assert True, "Error!! Unrecognized endianness: " + tag_val
-       
+
 def getCh(infile):
     return chr(infile.read(1)[0])
     #return "" + struct.unpack('s', infile.read(1))[0]
@@ -90,7 +90,7 @@ def readData(infile, io):
     # Compute and save how many values.
     total_vals = io['XDIM'] * io['YDIM'] * io['ZDIM']
     io['data_size'] = total_vals
-    
+
     # Actually read them from the file.
     arrpacker = struct.Struct((end + "%d" + px) % total_vals)
     inp_bytes = infile.read()
@@ -135,24 +135,24 @@ def getDataType(p_type, p_size):
 def readINR(fname):
     """Returns a dictionary with various entries representing an INR file.
     An INR file consists of the following:
-#INRIMAGE-4#{ 
-XDIM=128  // x dimension 
-YDIM=128  // y dimension 
-ZDIM=128  // z dimension 
-VDIM=1    // number of scalar per voxel (1 = scalar image, 3 = 3D image of vectors) 
+#INRIMAGE-4#{
+XDIM=128  // x dimension
+YDIM=128  // y dimension
+ZDIM=128  // z dimension
+VDIM=1    // number of scalar per voxel (1 = scalar image, 3 = 3D image of vectors)
         // Note: VDIM must be 1 for this to work.
-VX=0.66   // voxel size in x 
-VY=0.66   // voxel size in y 
-VZ=1      // voxel size in z 
-TYPE=unsigned fixed   // float, signed fixed, or unsigned fixed 
-PIXSIZE=16 bits  // 8, 16, 32, or 64 
-SCALE=2**0       // not used in my program 
-CPU=decm         // decm, alpha, pc, sun, sgi 
+VX=0.66   // voxel size in x
+VY=0.66   // voxel size in y
+VZ=1      // voxel size in z
+TYPE=unsigned fixed   // float, signed fixed, or unsigned fixed
+PIXSIZE=16 bits  // 8, 16, 32, or 64
+SCALE=2**0       // not used in my program
+CPU=decm         // decm, alpha, pc, sun, sgi
                  // little endianness : decm, alpha, pc; big endianness :sun, sgi
 
 // fill with carriage return or with any other information
-##} // until the total size of the header is 256 characters (including final newline character) 
-// raw data, size=XDIM*YDIM*ZDIM*PIXSIZE/8 
+##} // until the total size of the header is 256 characters (including final newline character)
+// raw data, size=XDIM*YDIM*ZDIM*PIXSIZE/8
 
     After this function has been called, the returned object will be a
     dictionary with the following elements defined:
@@ -169,9 +169,68 @@ CPU=decm         // decm, alpha, pc, sun, sgi
     with open(fname, 'rb') as infile:
         # Get the header.
         readINRHeader(infile, inr_obj)
-        
+
         # If all goes well, these values should be set:
         # read a total of XDIM*YDIM*ZDIM things from raw bits.
         readData(infile, inr_obj)
 
         return inr_obj
+
+
+def writeINR(data, filename, voxSizes):
+    """Write an INR file to the given filename and voxel dimensions."""
+
+    if data.ndim == 3:
+        # We have monochrome data
+        (X,Y,Z) = np.shape(data)
+        vDim = 1
+    elif data.ndim == 4:
+        # We have colored data
+        (X,Y,Z,vDim) = np.shape(data)
+    else:
+        raise ValueError("INR Data must have 3 or 4 dimensions")
+
+    # Extract voxel sizes
+    (vx,vy,vz) = voxSizes
+
+    if sys.byteorder == 'little':
+        cpustring = 'pc'
+    else:
+        print("[WARN]: Python claims you're on a big-endian system.")
+        print("No guarantees this function is going to work.")
+
+        cpustring = 'sgi'
+
+    header =\
+"""#INRIMAGE-4#{
+XDIM=%d
+YDIM=%d
+ZDIM=%d
+VDIM=%d
+VX=%f
+VY=%f
+VZ=%f
+TYPE=float
+PIXSIZE=32 bits
+SCALE=2**0
+CPU=%s
+"""%(X,Y,Z,vDim,vx,vy,vz,cpustring)
+
+    while len(header) !=  252:
+        header += "\n"
+
+    header += "##}\n"
+
+    assert len(header) == 256, "INR Header is wrong length!"
+
+    numElem = np.size(data)
+    arrpacker = struct.Struct('@%df'%numElem) # native-ordering
+
+    with open(filename,'wb') as inrfile:
+        inrfile.write(header.encode('ascii'))
+
+        flatdata = data.ravel(order='F')
+        packed = arrpacker.pack(*flatdata)
+        inrfile.write(packed)
+
+    return #and done
