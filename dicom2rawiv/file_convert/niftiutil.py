@@ -5,10 +5,10 @@ import struct
 import sys
 import nibabel as nib
 
-def readNii(fname):
+def readNii(filename):
     """Read a given filename and return a dict"""
 
-    img = nib.load(fname)
+    img = nib.load(filename)
 
     retdict = {}
 
@@ -22,7 +22,7 @@ def readNii(fname):
 
     return retdict
 
-def writeNii(data, fname, spacings, ignore_ext=False):
+def writeNii(data, filename, spacings, ignore_ext=False):
     """Write the given numpy array to file."""
 
     if not ignore_ext:
@@ -39,6 +39,6 @@ def writeNii(data, fname, spacings, ignore_ext=False):
 
     outImg = nib.Nifti1Image(data, affineTransform)
 
-    outImg.to_filename(fname)
+    outImg.to_filename(filename)
 
     return
