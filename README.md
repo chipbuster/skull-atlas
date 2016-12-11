@@ -30,7 +30,68 @@ Skull Atlas 2016
 ```
 
 This repository is meant to store the prototype Skull Atlas as created by CVC
-for the Dell Medical School.
+for the Dell Medical School. It could theoretically run on all UNIXes, but due
+to difference between GNU and BSD tools, is only working on Linux.
+
+### Prerequisites
+
+The list of prerequisite software for this project is incredibly large and
+only grows with time. Some optional pieces become mandatory due to structural
+changes (and vice versa), so this README might not always be up to date. There
+are three general families of requirements: C++ build tools and libraries,
+Python and its libraries, and R and its libraries.
+
+#### Required Software
+##### C++ and Friends
+
+You will need:
+
+  * CMake (v3.2.0 or greater)
+  * A C++ compiler (currently only tested on g++ and clang++)
+  * A Fortran compiler (currently only tested with gfortran)
+  * UNIX build tools (automake, autoconf, make, m4, etc.)
+  * Boost (1.62.0)
+  * Qt4
+  * libgmp
+  * libmpfr
+  * [freeglut3](http://freeglut.sourceforge.net/)
+  * [CGAL](http://www.cgal.org/) (v4.8.1 or greater)
+  
+If you're on Ubuntu, you can find install commands for all of these packages
+in the `.travis.yml` (just copy-paste the instructions one at a time from the
+section `pre_install`)
+
+Note: Most of these libraries are available in the repos of most mainstream linux
+distributions. freeglut is sometimes tricky to find, but it usually exists.
+
+##### Python and Friends
+
+You will need:
+  
+  * python3 (the code may run under python2, but it is not guaranteed)
+  * numpy
+  * [PyDICOM](http://www.pydicom.org/)
+  * [niBabel](http://nipy.org/nibabel/)
+  * [rpy2](https://rpy2.bitbucket.io/)
+  
+##### R and Friends
+
+You will need:
+  
+  * R
+  * [RNiftyReg](https://cran.r-project.org/web/packages/RNiftyReg/index.html)
+
+Libraries can be installed in R with the command `install.packages(<pkgname>)`, e.g.
+`install.packages('RNiftyReg')`
+
+#### Optional Software
+
+In order to build/run some of the older, deprecated programs in this repo, you
+will additionally need:
+
+  * sqlite3
+  * matlab
+  * an OpenGL-enabled web browser
 
 ### Building
 
@@ -68,4 +129,6 @@ This section needs to be redone after the shifting around.
 
 ### Notes on TravisCI
 
-Currently, TravisCI downloads and builds its own copy of CGAL, due to the version in Ubuntu being goddamn ancient. It still uses Ubuntu's system copies of Boost/MPFR/GMP for dependencies of CGAL.
+Currently, TravisCI downloads and builds its own copy of CGAL, due to the
+version in Ubuntu being goddamn ancient. It still uses Ubuntu's system copies of
+Boost/MPFR/GMP for dependencies of CGAL.
