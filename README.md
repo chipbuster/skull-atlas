@@ -33,6 +33,18 @@ This repository is meant to store the prototype Skull Atlas as created by CVC
 for the Dell Medical School. It could theoretically run on all UNIXes, but due
 to difference between GNU and BSD tools, is only working on Linux.
 
+### How to acquire this source code
+
+This repository is hosted on GitHub and has submodule components. Thus, the
+correct way to clone this repository is
+
+```
+git clone --recursive https://github.com/chipbuster/skull-atlas.git
+```
+
+Not cloning recursively may lead to errors unless certain parts of the build
+are disabled.
+
 ### Prerequisites
 
 The list of prerequisite software for this project is incredibly large and
@@ -56,13 +68,18 @@ You will need:
   * libmpfr
   * [freeglut3](http://freeglut.sourceforge.net/)
   * [CGAL](http://www.cgal.org/) (v4.8.1 or greater)
+  * Eigen3
   
 If you're on Ubuntu, you can find install commands for all of these packages
 in the `.travis.yml` (just copy-paste the instructions one at a time from the
 section `pre_install`)
 
-Note: Most of these libraries are available in the repos of most mainstream linux
-distributions. freeglut is sometimes tricky to find, but it usually exists.
+Note: Most of these libraries are available in the repos of most mainstream 
+linux distributions. freeglut can be tricky to find, but it usually exists.
+
+[LibIGL](https://github.com/libigl/libigl) is also required, but it is
+already provided in this source code (as a git submodule), so you do not
+need to download/install it unless you want to.
 
 ##### Python and Friends
 

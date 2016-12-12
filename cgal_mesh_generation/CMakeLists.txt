@@ -21,7 +21,6 @@ add_executable(surf2medax surface_medax.cpp)
 target_link_libraries(surf2medax ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES})
 install (TARGETS surf2medax DESTINATION bin)
 
-
 # Segment library uses libigl. Findlibigl is in cmake dir
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
@@ -79,17 +78,17 @@ if (LIBIGL_FOUND)
   ### Add executables
   # Segmentation program
   add_executable(segment cgal_segment.cpp ${LIBIGL_EXTRA_SOURCES})
-  target_link_libraries(segment 
-    ${CGAL_LIBRARIES} 
+  target_link_libraries(segment
+    ${CGAL_LIBRARIES}
     ${CGAL_3RD_PARTY_LIBRARIES}
     ${LIBIGL_LIBRARIES}
     ${LIBIGL_EXTRA_LIBRARIES})
   install (TARGETS segment DESTINATION bin)
-  
+
   # Removal of non-body elements.
   add_executable(precurate remove_nonbody.cpp ${LIBIGL_EXTRA_SOURCES})
-  target_link_libraries(precurate 
-    ${CGAL_LIBRARIES} 
+  target_link_libraries(precurate
+    ${CGAL_LIBRARIES}
     ${CGAL_3RD_PARTY_LIBRARIES}
     ${LIBIGL_LIBRARIES}
     ${LIBIGL_EXTRA_LIBRARIES})
@@ -97,17 +96,17 @@ if (LIBIGL_FOUND)
 
   # This will convert a non-triangular .off file to a triangular .off file.
   add_executable(triangular_mesh triangular_mesh.cpp)
-  target_link_libraries(triangular_mesh 
-    ${CGAL_LIBRARIES} 
+  target_link_libraries(triangular_mesh
+    ${CGAL_LIBRARIES}
     ${CGAL_3RD_PARTY_LIBRARIES}
     ${LIBIGL_LIBRARIES}
     ${LIBIGL_EXTRA_LIBRARIES})
   install (TARGETS triangular_mesh DESTINATION bin)
-  
+
   # Extracts components from a mesh (will do it visually)
   add_executable(select_components select_components.cpp ${LIBIGL_EXTRA_SOURCES})
-  target_link_libraries(select_components 
-    ${CGAL_LIBRARIES} 
+  target_link_libraries(select_components
+    ${CGAL_LIBRARIES}
     ${CGAL_3RD_PARTY_LIBRARIES}
     ${LIBIGL_LIBRARIES}
     ${LIBIGL_EXTRA_LIBRARIES})
@@ -115,25 +114,25 @@ if (LIBIGL_FOUND)
 
   # Sets points on the skull
   add_executable(point_selector point_selector.cpp ${LIBIGL_EXTRA_SOURCES})
-  target_link_libraries(point_selector 
-    ${CGAL_LIBRARIES} 
+  target_link_libraries(point_selector
+    ${CGAL_LIBRARIES}
     ${CGAL_3RD_PARTY_LIBRARIES}
     ${LIBIGL_LIBRARIES}
     ${LIBIGL_EXTRA_LIBRARIES})
   install (TARGETS point_selector DESTINATION bin)
   # Sets points on the skull
   add_executable(point_selector_raw point_selector_raw.cpp ${LIBIGL_EXTRA_SOURCES})
-  target_link_libraries(point_selector_raw 
-    ${CGAL_LIBRARIES} 
+  target_link_libraries(point_selector_raw
+    ${CGAL_LIBRARIES}
     ${CGAL_3RD_PARTY_LIBRARIES}
     ${LIBIGL_LIBRARIES}
     ${LIBIGL_EXTRA_LIBRARIES})
   install (TARGETS point_selector_raw DESTINATION bin)
-  
+
   # Decimate mesh
   add_executable(decimate decimate.cpp ${LIBIGL_EXTRA_SOURCES})
-  target_link_libraries(decimate 
-    ${CGAL_LIBRARIES} 
+  target_link_libraries(decimate
+    ${CGAL_LIBRARIES}
     ${CGAL_3RD_PARTY_LIBRARIES}
     ${LIBIGL_LIBRARIES}
     ${LIBIGL_EXTRA_LIBRARIES})
@@ -142,7 +141,7 @@ if (LIBIGL_FOUND)
   # Color the mesh by the curvature values
   add_executable(color_curvature color_curvature.cpp ${LIBIGL_EXTRA_SOURCES})
   target_link_libraries(color_curvature 
-    ${CGAL_LIBRARIES} 
+    ${CGAL_LIBRARIES}
     ${CGAL_3RD_PARTY_LIBRARIES}
     ${LIBIGL_LIBRARIES}
     ${LIBIGL_EXTRA_LIBRARIES})
@@ -150,12 +149,15 @@ if (LIBIGL_FOUND)
 
   # Distance between two meshes
   add_executable(distMeshMesh distMeshMesh.cpp ${LIBIGL_EXTRA_SOURCES})
-  target_link_libraries(distMeshMesh 
-    ${CGAL_LIBRARIES} 
+  target_link_libraries(distMeshMesh
+    ${CGAL_LIBRARIES}
     ${CGAL_3RD_PARTY_LIBRARIES}
     ${LIBIGL_LIBRARIES}
     ${LIBIGL_EXTRA_LIBRARIES})
   install (TARGETS distMeshMesh DESTINATION bin)
-
+elseif(LIBIGL_FOUND)
+  message(FATAL_ERROR "You have requested components that rely on libIGL but it was not found.
+If you are not developing this library, you may have cloned this git repository without
+submodules. Check that extdeps/libigl actually has files inside of it, and follow the
+")
 endif(LIBIGL_FOUND)
-

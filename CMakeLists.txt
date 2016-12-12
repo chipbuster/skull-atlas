@@ -11,9 +11,14 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-option(BUILD_CGAL_MESH_GEN "Builds the CGAL-based mesh creation libraries" OFF)
+option(BUILD_CGAL_MESH_GEN "Builds the CGAL-based mesh creation libraries" ON)
 if(BUILD_CGAL_MESH_GEN)
   add_subdirectory(cgal_mesh_generation)
+  if(NOT EXISTS "${PROJECT_SOURCE_DIR}/extdeps/libigl/README.md")
+    message(WARNING "You have requested C++ components, but you did not appear
+to have cloned libigl. This is likely a mistake unless you have a system
+copy of libigl--please see the README.md for instructions on correct cloning.")
+  endif(NOT EXISTS "${PROJECT_SOURCE_DIR}/extdeps/libigl/README.md")
 endif(BUILD_CGAL_MESH_GEN)
 
 option(BUILD_DICOM_PIPELINE "Builds the pipeline to take raw DICOM images to rawiv files + metadata" ON)

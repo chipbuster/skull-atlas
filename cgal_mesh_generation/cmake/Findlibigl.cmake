@@ -15,6 +15,7 @@ FIND_PATH(LIBIGL_INCLUDE_DIR igl/readOBJ.h
    ${PROJECT_SOURCE_DIR}/../../libigl/include
    ${PROJECT_SOURCE_DIR}/../libigl/include
    ${PROJECT_SOURCE_DIR}/libigl/include
+   ${PROJECT_SOURCE_DIR}/extdeps/libigl/include
    $ENV{LIBIGL}/include
    $ENV{LIBIGLROOT}/include
    $ENV{LIBIGL_ROOT}/include
