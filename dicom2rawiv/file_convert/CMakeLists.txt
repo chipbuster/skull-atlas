@@ -5,4 +5,3 @@ install(FILES dicomutil.py rawivutil.py slices2rawiv.py DESTINATION ${CMAKE_RUNT
 # Also install to actual install location
 install(PROGRAMS convert_all.py DESTINATION bin
   RENAME convert_all)
-install(FILES dicomutil.py rawivutil.py inrutil.py niftiutil.py slices2rawiv.py DESTINATION bin)

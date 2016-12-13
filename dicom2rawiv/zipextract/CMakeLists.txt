@@ -1,6 +1,8 @@
 # Add grassroots DICOM to build
 
-add_subdirectory(gdcm-2.6.3)
+if(BUILD_GDCM)
+  add_subdirectory(gdcm-2.6.3)
+endif(BUILD_GDCM)
 
 # Install the shell scripts
 install(PROGRAMS build_data_tree.sh DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
