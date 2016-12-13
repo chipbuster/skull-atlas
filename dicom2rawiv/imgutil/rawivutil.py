@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import numpy as np
+import os
 import struct
 import binascii
 
@@ -149,6 +150,13 @@ def readRawIV(fname):
         rawivDict['origin'] = (originX,originY,originZ)
         rawivDict['span'] = (spanX, spanY, spanZ)
 
+        # Calculate spacings as a convenience
+        gapX = (maxX - minX) / (dimX - 1)
+        gapY = (maxY - minY) / (dimY - 1)
+        gapZ = (maxZ - minZ) / (dimZ - 1)
+
+        rawivDict['spacings'] = (gapX, gapY, gapZ)
+
         # Now extract rawIV data and form into shape given by header data
         arrpacker = struct.Struct('>%df' % numVerts)
         inp=infile.read()
@@ -159,3 +167,38 @@ def readRawIV(fname):
         rawivDict['data'] = imgdata
 
         return rawivDict
+
+def isRawIV(fname):
+    """Determine if this is a rawiv file."""
+
+    # This is tricky because there is no definitive standard for what qualifies as
+    # a rawiv file. The best bet we have is to try to extract the dimensions and
+    # see if they properly match the size of the file. If so, we can guess that
+    # this is probably a RawIV. If not, either it's corrupted or it isn't.
+
+    intpacker = struct.Struct('>I')
+    rawivHeaderSize = 68
+
+    with open(fname,'rb') as infile:
+        infile.seek(32) #To start of dim
+
+        rawX = infile.read(4)
+        rawY = infile.read(4)
+        rawZ = infile.read(4)
+
+        dimX = intpacker.unpack(rawX)[0]
+        dimY = intpacker.unpack(rawY)[0]
+        dimZ = intpacker.unpack(rawZ)[0]
+
+        # The correct size of the file is the data size plus the header size
+        # The data can be 1, 2, or 4 bytes per element
+        numElem = dimX * dimY * dimZ
+
+        actualFileSize = os.path.getsize(fname)
+
+        for dataElemSize in [1,2,4]:
+            computedFileSize = numElem * dataElemSize + rawivHeaderSize
+            if computedFileSize == actualFileSize:
+                return True
+
+        return False

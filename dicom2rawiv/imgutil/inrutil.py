@@ -234,3 +234,16 @@ CPU=%s
         inrfile.write(packed)
 
     return #and done
+
+def isINR(fname):
+    """Determine if this is an INR file."""
+
+    # Simple: look for the INRIMAGE string in the header
+    with open(fname,'rb') as infile:
+
+        prefixStr = infile.read(9)
+        if prefixStr == b"#INRIMAGE":
+            return True
+        else:
+            return False
+

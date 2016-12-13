@@ -114,8 +114,8 @@ def patient_dicom_to_imgs(inp_tuple):
 
         # Write the image to multiple formats
         rawivutil.writeRawIV(img,rawiv_out,(xs,ys,zs))
-        inrutil.writeINR(img,inr_out,(xs,ys,zs))
-        niftiutil.writeNii(img,nii_out,(xs,ys,zs))
+#        inrutil.writeINR(img,inr_out,(xs,ys,zs))
+#        niftiutil.writeNii(img,nii_out,(xs,ys,zs))
         del img
 
     print("Done processing DICOM data for patient " + patient_id)
