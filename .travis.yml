@@ -27,18 +27,13 @@ before_install:
     - cd ..
 
 # Enable C++ support
+# Note: this doesn't appear to actually use the specified compilers
+# but it means that the compilers that are actually used end up
+# being fresh enough (g4.8+ and c3.5+) that c++11 will mostly
+# compile.
 language: cpp
-# Compiler selection
 matrix:
   include:
-    - compiler: gcc
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - g++-4.9
-      env: COMPILER=g++-4.9
     - compiler: gcc
       addons:
         apt:
