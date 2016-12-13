@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import sys
 import os
 import numpy as np
@@ -31,8 +33,8 @@ def convert(fnameIn, fnameOut, formatIn, formatOut):
     # Figure out the input type and read in the appropriate values for data and
     # pixel anisotroy (in the spacings variable)
     if formatIn == IMGType.nii:
-        img = niftiutil.readNii(fnameIn)
-        pixd = img['pixdim']
+        imgObj = niftiutil.readNii(fnameIn)
+        pixd = imgObj['pixdim']
         spacings = (pixd[1], pixd[2], pixd[3]) #0 reserved for time dimension
         imgObjdata  = imgObj['data']
 
@@ -95,7 +97,7 @@ def main():
          and nameInputType != guessInputType:
         print("[WARN]: File suffix and actual image format appear to differ for "
               + args.inputname + ". I'm going with the filename, but you might "
-              + "want to double check this one.")
+              + "want to double check this one, especially if this script crashes.")
         inputType = nameInputType
     elif nameInputType is None:
         inputType = guessInputType
@@ -130,14 +132,15 @@ def main():
     if args.outputformat is not None:
         outputPath = os.path.dirname(args.inputname)
         outputFilenameWrong = os.path.basename(args.inputname) #It has the wrong suffix
-        outputFilenameCore = outputFilenameWrong.split("/")[:-1] #All but the final suffix
+        outputFilenameCore = outputFilenameWrong.split(".")[:-1] #All but the final suffix
 
-        outputFilename = outputFilenameCore + "." + args.outputformat
+        outputFilename = "".join(outputFilenameCore) + "." + args.outputformat
         output = os.path.join(outputPath, outputFilename)
         explicitOutputType = IMGType[args.outputformat]
 
     # Set format from output name
     if args.outputname is not None:
+        outputFilename = args.outputname
         outputFormatString = os.path.basename(args.outputname).split('.')[-1]
 
         try:
@@ -149,7 +152,7 @@ def main():
     if fnameOutputType is not None and explicitOutputType is not None\
        and fnameOutputType != explicitOutputType:
         print("[WARN]: Filename and explicitly specified output format disagree." +
-              "I will do as you ask, but make sure this is really what you want.")
+              " I will do as you ask, but make sure this is really what you want.")
         outputType = explicitOutputType
         outputFilename = args.outputname
     elif fnameOutputType is None:
@@ -157,9 +160,21 @@ def main():
     else:
         outputType = fnameOutputType
 
+    # See if anyone is doing anything sneaky
+    if os.path.realpath(args.inputname) == os.path.realpath(outputFilename):
+        print("[ERROR]: Cowardly refusing to overwrite the input file.")
+        sys.exit(-4)
 
     # We're done! Just call the logic
-    convert(args.inputname, outputFilename, inputType, outputType)
+    try:
+        convert(args.inputname, outputFilename, inputType, outputType)
+    except:
+        print("[ERROR]: Conversion program errored. This could be because a bug slipped" +
+              " past the argparser, or it could be because you specified a bad input type." +
+              " I'm printing the error below for your reference.")
+        print("\n")
+        raise
+
 
 if __name__ == "__main__":
     main()

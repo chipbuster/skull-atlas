@@ -44,7 +44,7 @@ def writeNii(data, fname, spacings):
 
     return
 
-def isNifti(fname):
+def isNii(fname):
     """Determine if the file is a valid NIFTI file"""
 
     # Idea from https://brainder.org/2015/04/03/the-nifti-2-file-format
