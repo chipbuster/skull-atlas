@@ -180,7 +180,10 @@ def isRawIV(fname):
     rawivHeaderSize = 68
 
     with open(fname,'rb') as infile:
-        infile.seek(32) #To start of dim
+        infile.seek(24)
+
+        numVerts = intpacker.unpack(infile.read(4))[0]
+        infile.read(4) #Discard 4 bytes corresponding to numCells
 
         rawX = infile.read(4)
         rawY = infile.read(4)
@@ -189,6 +192,13 @@ def isRawIV(fname):
         dimX = intpacker.unpack(rawX)[0]
         dimY = intpacker.unpack(rawY)[0]
         dimZ = intpacker.unpack(rawZ)[0]
+
+#        print(numVerts)
+#        print(dimX,dimY,dimZ)
+
+        # Make sure the numVerts and dimensions are consistent
+        if numVerts != dimX * dimY * dimZ:
+            return False
 
         # The correct size of the file is the data size plus the header size
         # The data can be 1, 2, or 4 bytes per element
