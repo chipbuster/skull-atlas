@@ -1,0 +1,3 @@
+[submodule "extdeps/libigl"]
+	path = extdeps/libigl
+	url = https://github.com/libigl/libigl.git
