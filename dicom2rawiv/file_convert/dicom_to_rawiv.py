@@ -70,7 +70,7 @@ def patient_dicom_to_imgs(inp_tuple):
             continue
 
         # Give this series an identifier
-        series_name = "series_%d" % counter
+        series_name = "series%d" % counter
         counter += 1
 
         # Extract the actual dicom out of the tuples

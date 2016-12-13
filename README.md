@@ -140,6 +140,10 @@ or I will hunt you down and use a sharp object on you.
 Runtime tests can be added by using the `add_test` command
 [from CMake](https://cmake.org/cmake/help/v2.8.10/cmake.html#command:add_test)
 
+### Running
+
+Work is ongoing on a global pipeline driver.
+
 ### Components
 
 This section needs to be redone after the shifting around.

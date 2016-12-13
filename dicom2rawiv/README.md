@@ -49,6 +49,8 @@ twice, since CentOS can be a bit pouty for no good reason.
 
 To install PyDICOM, do `pip-python3 install --user pydicom`
 
+To install niBabel, do `pip-python3 install --user nibabel`
+
 The other prerequisites should already be installed. I've found that the following
 module combination works: I haven't tested any others.
 
