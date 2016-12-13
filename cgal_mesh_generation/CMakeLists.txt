@@ -75,7 +75,7 @@ if (LIBIGL_FOUND)
   message("libIGL definitions: ${LIBIGL_DEFINITIONS}")
 
   ### Prepare the build environment
-  include_directories(${LIBIGL_INCLUDE_DIRS})
+  include_directories(SYSTEM ${LIBIGL_INCLUDE_DIRS})
   add_definitions(${LIBIGL_DEFINITIONS})
 
   ### Add executables
