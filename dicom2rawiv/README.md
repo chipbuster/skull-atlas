@@ -123,7 +123,7 @@ DICOM input shows up from Dr. Ross as a series of ZIP files. Depending on how th
 
 #### Decompression
 
-The [PyDICOM package](http://www.pydicom.org/) cannot yet (Summer 2016) view compressed images. Unfortunately, some of the data comes in JPEG format (this is allowed by the DICOM standard), which iscompressed. To fix this, we use `gdcmconv`, which is part of the [Grassroots DICOM package](https://sourceforge.net/projects/gdcm/), to decompress the images. At the end of this stage, uncompressed DICOM images should be stored at `DICOMUNC` directory.
+The [PyDICOM package](http://www.pydicom.org/) cannot yet (Summer 2016) view compressed images. Unfortunately, some of the data comes in JPEG format (this is allowed by the DICOM standard), which is compressed. To fix this, we use `gdcmconv`, which is part of the [Grassroots DICOM package](https://sourceforge.net/projects/gdcm/), to decompress the images. At the end of this stage, uncompressed DICOM images should be stored at `DICOMUNC` directory.
 
 Note that if, in the future, PyDICOM becomes capable of reading compressed images, this step can be dropped and `DICOMUNC` can be replaced with a symlink to `DICOMOBJ`
 

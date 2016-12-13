@@ -50,7 +50,7 @@ int main(int argc, char* argv[]) {
   if (argc == 5) {
     debug = true;
   }
-  
+
   CGAL::Random::State state;
   unsigned int seed = 0;
   CGAL::Random random(seed);
@@ -60,18 +60,24 @@ int main(int argc, char* argv[]) {
   const char* input_image_filename = argv[1];
   const char* output_mesh_filename = argv[2];
   double isovalue = atof(argv[3]);
-  fprintf(stderr, "Using an isovalue of %lf\n", isovalue);
+
+  if(debug){
+    fprintf(stderr, "Input file is %s\n", input_image_filename);
+    fprintf(stderr, "Output file is %s\n", output_mesh_filename);
+    fprintf(stderr, "Using an isovalue of %lf\n", isovalue);
+  }
 
   Image_3 image;
   if (!image.read(input_image_filename)) {
     fprintf(stderr, "CGAL failed to read image file \"%s\".\n", input_image_filename);
     return -1;
   }
-  fprintf(stderr, "Finished reading image, now extracting surface...\n");
+
+  if(debug) fprintf(stderr, "Finished reading image, now extracting surface...\n");
 
   Polyhedron mesh = ImageLevelSurfaceToMeshConverter<>().convertToMesh(image, isovalue);
 
-  fprintf(stderr, "Created mesh. Now processing...\n");
+  if(debug) fprintf(stderr, "Created mesh. Now processing...\n");
   mesh.keep_largest_connected_components(1);
 
   CGAL::Side_of_triangle_mesh<Polyhedron, Kernel> inside(mesh);
@@ -105,10 +111,9 @@ int main(int argc, char* argv[]) {
     viewer.launch();
   }
 
-  fprintf(stderr, "Finished. Now writing image to %s\n", argv[2]);
+  if(debug) fprintf(stderr, "Finished. Now writing image to %s\n", argv[2]);
   // Call CGAL's _writeImage function.
   _writeImage(image.image(), argv[2]);
 
   return 0;
 }
-

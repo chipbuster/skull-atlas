@@ -25,3 +25,8 @@ option(BUILD_DICOM_PIPELINE "Builds the pipeline to take raw DICOM images to raw
 if(BUILD_DICOM_PIPELINE)
   add_subdirectory(dicom2rawiv)
 endif(BUILD_DICOM_PIPELINE)
+
+option(BUILD_GLOBAL_DRIVER "Installs the scripts to drive the global pipeline." ON)
+if(BUILD_GLOBAL_DRIVER)
+  add_subdirectory(globalpipeline)
+endif(BUILD_GLOBAL_DRIVER)

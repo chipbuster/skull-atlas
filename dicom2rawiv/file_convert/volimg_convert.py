@@ -129,18 +129,19 @@ def main():
               "an output format or an output filename.")
         sys.exit(-3)
 
+    # If a file format is provided, infer the output name from the input file
     if args.outputformat is not None:
         outputPath = os.path.dirname(args.inputname)
         outputFilenameWrong = os.path.basename(args.inputname) #It has the wrong suffix
         outputFilenameCore = outputFilenameWrong.split(".")[:-1] #All but the final suffix
 
         outputFilename = "".join(outputFilenameCore) + "." + args.outputformat
-        output = os.path.join(outputPath, outputFilename)
         explicitOutputType = IMGType[args.outputformat]
 
-    # Set format from output name
+    # If a name is provided, infer the output format
     if args.outputname is not None:
         outputFilename = args.outputname
+        outputPath = os.path.dirname(args.outputname)
         outputFormatString = os.path.basename(args.outputname).split('.')[-1]
 
         try:
@@ -152,7 +153,9 @@ def main():
     if fnameOutputType is not None and explicitOutputType is not None\
        and fnameOutputType != explicitOutputType:
         print("[WARN]: Filename and explicitly specified output format disagree." +
-              " I will do as you ask, but make sure this is really what you want.")
+              " I will do as you ask and create a file with the wrong suffix. " +
+              "Please ensure that this is what you intended to do.")
+
         outputType = explicitOutputType
         outputFilename = args.outputname
     elif fnameOutputType is None:
@@ -160,14 +163,17 @@ def main():
     else:
         outputType = fnameOutputType
 
+    # Join the output path to its filename
+    output = os.path.join(outputPath, outputFilename)
     # See if anyone is doing anything sneaky
-    if os.path.realpath(args.inputname) == os.path.realpath(outputFilename):
+
+    if os.path.realpath(args.inputname) == os.path.realpath(output):
         print("[ERROR]: Cowardly refusing to overwrite the input file.")
         sys.exit(-4)
 
     # We're done! Just call the logic
     try:
-        convert(args.inputname, outputFilename, inputType, outputType)
+        convert(args.inputname, output, inputType, outputType)
     except:
         print("[ERROR]: Conversion program errored. This could be because a bug slipped" +
               " past the argparser, or it could be because you specified a bad input type." +
