@@ -2,6 +2,7 @@
 #include <fstream>
 
 #include <CGAL/ImageIO.h>
+#include <CGAL/ImageIO/inr.h>
 #include <CGAL/IO/print_wavefront.h>
 #include <CGAL/Random.h>
 #include <CGAL/Side_of_triangle_mesh.h>
@@ -113,7 +114,7 @@ int main(int argc, char* argv[]) {
 
   if(debug) fprintf(stderr, "Finished. Now writing image to %s\n", argv[2]);
   // Call CGAL's _writeImage function.
-  _writeImage(image.image(), argv[2]);
+  writeInrimage(argv[2], image.image());
 
   return 0;
 }
