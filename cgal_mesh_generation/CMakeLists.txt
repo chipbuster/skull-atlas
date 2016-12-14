@@ -1,12 +1,10 @@
 cmake_minimum_required (VERSION 2.8)
 
-add_subdirectory(volume_diff)
-
-find_package(CGAL REQUIRED COMPONENTS Core ImageIO)
+find_package(CGAL REQUIRED COMPONENTS Core ImageIO
+             PATHS "/org/centers/cvc/software/c7/libraries/CGAL4.9/")
 include(${CGAL_USE_FILE})
 
-find_package(Eigen3 REQUIRED)
-include_directories(${EIGEN3_INCLUDE_DIR})
+add_subdirectory(volume_diff)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 

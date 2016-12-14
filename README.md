@@ -90,6 +90,9 @@ You will need:
   * [PyDICOM](http://www.pydicom.org/)
   * [niBabel](http://nipy.org/nibabel/)
   * [rpy2](https://rpy2.bitbucket.io/)
+
+If you are using Python3 version 3.3 or older, you will also need to install
+the backported enum package [`enum34`](https://pypi.python.org/pypi/enum34)
   
 ##### R and Friends
 
