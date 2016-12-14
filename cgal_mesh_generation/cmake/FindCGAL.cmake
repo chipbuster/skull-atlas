@@ -11,7 +11,7 @@ ENDIF (CGAL_INCLUDE_DIR)
 
 GET_FILENAME_COMPONENT(module_file_path ${CMAKE_CURRENT_LIST_FILE} PATH )
 
-IF (NOT APPLE )
+IF (NOT UNIX )
 	# Look for the header file.
 	FIND_PATH(CGAL_INCLUDE_DIR NAMES CGAL/auto_link/auto_link.h
         	                   PATHS /usr/include
@@ -27,14 +27,18 @@ IF (NOT APPLE )
 								 "C:/Program Files/CGAL-3.9/include"
 								 "C:/Program Files (x86)/CGAL-3.9/include"
 	                             ${module_file_path}/../../../External/include)
-ELSE( NOT APPLE)
+ELSE( NOT UNIX)
 	# Look for the header file.
 	FIND_PATH(CGAL_INCLUDE_DIR NAMES CGAL/auto_link/auto_link.h
-        	                   PATHS 
+        	                   PATHS
+                               "/org/centers/cvc/software/c7/libs/CGAL4.9/include"
+                               "/org/centers/cvc/software/c7/libs/"
                                "/opt/local/include"
+                               "/usr/local/include"
+                               "/usr/include"
                  )
 
-ENDIF( NOT APPLE )
+ENDIF( NOT UNIX )
 
 
 
@@ -81,9 +85,6 @@ IF(CGAL_INCLUDE_DIR )
     # This is needed to link correctly against lapack
     add_definitions (-DCGAL_USE_F2C)
   ENDIF(WIN32)
-
-
- 
 
 ELSE(CGAL_INCLUDE_DIR )
   SET(CGAL_FOUND 0)

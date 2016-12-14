@@ -1,9 +1,12 @@
 cmake_minimum_required (VERSION 2.8)
 
+# Add homegrown cmake modules to cmake module path
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+
 add_subdirectory(volume_diff)
 
 find_package(CGAL REQUIRED COMPONENTS Core ImageIO)
-include(${CGAL_USE_FILE})
+include_directories(${CGAL_INCLUDE_DIR})
 
 find_package(Eigen3 REQUIRED)
 include_directories(${EIGEN3_INCLUDE_DIR})
@@ -23,9 +26,6 @@ install (TARGETS inr2mc DESTINATION bin)
 add_executable(surf2medax surface_medax.cpp)
 target_link_libraries(surf2medax ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES})
 install (TARGETS surf2medax DESTINATION bin)
-
-# Segment library uses libigl. Findlibigl is in cmake dir
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 # Can use libigl found at /net/electron/workspace/nclement/software/libigl/build
 # or download using:  git clone --recursive https://github.com/libigl/libigl.git
