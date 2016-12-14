@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 2.8)
 
 find_package(CGAL REQUIRED COMPONENTS Core ImageIO)
-include_directories(${CGAL_INCLUDE_DIR})
+include(${CGAL_USE_FILE})
 
 add_executable(diff_volume main.cpp)
 
