@@ -57,9 +57,18 @@ precurate_one(){
     IMAGE_IN="$1"
     IMAGE_OUT="$("$BINDIR/outputName" "$IMAGE_IN" "precurate")"
 
-    "$BINDIR/precurate" "$IMAGE_IN" "$IMAGE_OUT" 200
+    "$BINDIR/precurate" "$IMAGE_IN" "$IMAGE_OUT" 100
 }
 export -f precurate_one
+
+thresholdGrow_one(){
+    IMAGE_IN="$1"
+    IMAGE_OUT="$("$BINDIR/outputName" "$IMAGE_IN" "threshold")"
+
+    "$BINDIR/growskull" "$IMAGE_IN" "$IMAGE_OUT" 200 250
+}
+export -f thresholdGrow_one
+
 
 #####################
 ## PIPELINE DRIVER ##
@@ -87,4 +96,14 @@ timestamp_msg "Converting rawiv to inr in preparation for precuration"
 find "$WORKDIR" -name '*.rawiv' -print0 | "$XARGS" -I % -n 1 -0 -P $NCPU "$BINDIR/volimg_convert" % -of inr
 
 # Precurate the images by using Nathan's poorly commented C++ code
+timestamp_msg "Precurating images: select largest connected component above certain isovalue"
 find "$WORKDIR" -name '*.inr' -print0 | "$XARGS" -I % -n 1 -0 -P $NCPU precurate_one %
+
+# Convert the images into rawiv to prepare for thresholding and raster expansion
+find "$WORKDIR" -name '*_precurate.inr' -print0 | "$XARGS" -I % -n 1 -0 -P $NCPU "$BINDIR/volimg_convert" % -of rawiv
+
+# Threshold the skull voxels by using Kevin's shitty C++ code
+find "$WORKDIR" -name '*_precurate.rawiv' -print0 | "$XARGS" -I % -n 1 -0 -P $NCPU thresholdGrow_one %
+
+# Use conversion script to turn precurated skulls into Nifti images
+find "$WORKDIR" -name '*_threshold.inr' -print0 | "$XARGS" -I % -n 1 -0 -P $NCPU "$BINDIR/volimg_convert" % -of nii
