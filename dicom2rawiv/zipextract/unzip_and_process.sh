@@ -70,7 +70,7 @@ if [ -d "SynapseMediaSets" ]; then
 
     # We only expect Syn2016* to be in directory: if more than 1 file, this is unexpected
     if [ $(ls -1 SynapseMediaSets | wc -l ) != "1" ]; then
-        echo "[WARN] at $DIR: unexpected contents in SynapseMediaSets of $NUMID"
+        echo "[WARN] at $DIR: unexpected contents in SynapseMediaSets of $NUMID" >> /dev/stderr
     fi
 
     # Copy the appropriate DICOMOBJ to top-level if it exists
@@ -80,8 +80,8 @@ if [ -d "SynapseMediaSets" ]; then
         FOUND_FILES="true"
     else
         #Not good error reporting but I'm on a time budget here :(
-        echo "Could not find directory DICOMOBJ in SynapseMediaSets"
-        echo "Working in $DIR"
+        echo "Could not find directory DICOMOBJ in SynapseMediaSets" >> /dev/stderr
+        echo "Working in $DIR" >> /dev/stderr
         exit 1
     fi
 
@@ -98,7 +98,7 @@ if [ "$FOUND_FILES" = "false" ]; then
 
     if [ $? -eq 0 ]; then #Found a folder named Syn*
         if [ $(ls -1 | wc -l ) != "1" ]; then
-           echo "[WARN] at $DIR: unexpected contents in Syn[0-9]+ of $NUMID"
+           echo "[WARN] at $DIR: unexpected contents in Syn[0-9]+ of $NUMID" >> /dev/stderr
         fi
 
         if [ -d Syn*/DICOMOBJ ]; then
@@ -115,18 +115,18 @@ fi
 # (FINAL) Something else happened and none of the above triggered (currently unexpected)
 
 if [ ! -d "$NUMID" ]; then
-    echo "Something unexpected happened during file processing"
-    echo "After unzipping the archive for patient $NUMID"
-    echo "in $TMPDIR"
-    echo ""
-    echo "The files I'm seeing are:"
-    echo "$(ls -1)"
-    echo ""
-    echo ""
-    echo "Please report the above error to the script writer."
-    echo "###############"
-    echo "## Aborting! ##"
-    echo "###############"
+    echo "Something unexpected happened during file processing" >> /dev/stderr
+    echo "After unzipping the archive for patient $NUMID" >> /dev/stderr
+    echo "in $TMPDIR" >> /dev/stderr
+    echo "" >> /dev/stderr
+    echo "The files I'm seeing are:" >> /dev/stderr
+    echo "$(ls -1)" >> /dev/stderr
+    echo "" >> /dev/stderr
+    echo "" >> /dev/stderr
+    echo "Please report the above error to the script writer." >> /dev/stderr
+    echo "###############" >> /dev/stderr
+    echo "## Aborting! ##" >> /dev/stderr
+    echo "###############" >> /dev/stderr
     exit 1
 fi
 

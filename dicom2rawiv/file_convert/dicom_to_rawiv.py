@@ -38,6 +38,10 @@ import niftiutil
 import multiprocessing
 from slices2rawiv import *
 
+# Print to stderr
+def eprint(*args, **kwargs):
+    print(*args, file=sys.stderr, **kwargs)
+
 def patient_dicom_to_imgs(inp_tuple):
     # Input comes as a tuple for easier compat with multiprocessing
     # Need to unpack this tuple before proceeding
@@ -102,7 +106,7 @@ def patient_dicom_to_imgs(inp_tuple):
         try:
             (img, (xs,ys,zs)) = make_one_volimage_with_spacings(series_w_fnames)
         except ValueError as verror:
-            print("While trying to process series " + series_name + " for patient " + patient_id +
+            eprint("While trying to process series " + series_name + " for patient " + patient_id +
                   "\n" "in directory " + path + " I found a DICOM error which does not allow me to proceed."
                   "\nThe exception message is "+ str(verror) +
                   "\nI am abandoning this series and continuing.")
@@ -121,7 +125,7 @@ def patient_dicom_to_imgs(inp_tuple):
     print("Done processing DICOM data for patient " + patient_id)
 
     if len(os.listdir()) == 0:
-        print("[WARN]: Patient " + patient_id + " does not have any z-oriented series!")
+        eprint("[WARN]: Patient " + patient_id + " does not have any z-oriented series!")
 
 def main(path):
 

@@ -11,6 +11,10 @@ import niftiutil
 
 from enum import Enum
 
+# Print to stderr
+def eprint(*args, **kwargs):
+    print(*args, file=sys.stderr, **kwargs)
+
 # Define valid filetypes in an enumeration
 imgFormatStrings = "nii inr rawiv"
 IMGType = Enum('IMGType', imgFormatStrings)
@@ -74,7 +78,7 @@ def main():
     args = parser.parse_args()
 
     if not os.path.exists(args.inputname):
-        print("The file " + args.inputname + " doesn't appear to exist.")
+        eprint("The file " + args.inputname + " doesn't appear to exist.")
         sys.exit(-1)
 
     # Determine the input format
@@ -95,7 +99,7 @@ def main():
         inputType = guessInputType
     elif nameInputType is not None and guessInputType is not None\
          and nameInputType != guessInputType:
-        print("[WARN]: File suffix and actual image format appear to differ for "
+        eprint("[WARN]: File suffix and actual image format appear to differ for "
               + args.inputname + ". I'm going with the filename, but you might "
               + "want to double check this one, especially if this script crashes.")
         inputType = nameInputType
@@ -108,14 +112,14 @@ def main():
 
     # If we don't have a valid input type, check for an override
     if inputType is None and args.inputformat is None:
-        print("[ERROR]: We were unable to determine the input filetype from the\
+        eprint("[ERROR]: We were unable to determine the input filetype from the\
         filename or data for " + args.inputname +". Please ensure that the data\
         in the file is valid, or pass the input format using the '--inputformat'\
         flag. This flag only works when automated format detection fails--it\
         cannot override a successful format detection.")
         sys.exit(-2)
     elif inputType is None and args.inputformat is not None:
-        print("[WARN]: Overriding a bad format detection with " + args.inputformat)
+        eprint("[WARN]: Overriding a bad format detection with " + args.inputformat)
         inputType = args.inputformat
 
     ### Determine the output type
@@ -125,7 +129,7 @@ def main():
 
     # No output type given! Fail.
     if args.outputname is None and args.outputformat is None:
-        print("[ERROR]: I don't know what output you want! Please provide either "+
+        eprint("[ERROR]: I don't know what output you want! Please provide either "+
               "an output format or an output filename.")
         sys.exit(-3)
 
@@ -147,12 +151,12 @@ def main():
         try:
             fnameOutputType = IMGType[outputFormatString]
         except KeyError:
-            print("You gave me a bad suffix--I don't know what output format you want!")
+            eprint("You gave me a bad suffix--I don't know what output format you want!")
 
     # Check to make sure these agree
     if fnameOutputType is not None and explicitOutputType is not None\
        and fnameOutputType != explicitOutputType:
-        print("[WARN]: Filename and explicitly specified output format disagree." +
+        eprint("[WARN]: Filename and explicitly specified output format disagree." +
               " I will do as you ask and create a file with the wrong suffix. " +
               "Please ensure that this is what you intended to do.")
 
@@ -168,17 +172,17 @@ def main():
     # See if anyone is doing anything sneaky
 
     if os.path.realpath(args.inputname) == os.path.realpath(output):
-        print("[ERROR]: Cowardly refusing to overwrite the input file.")
+        eprint("[ERROR]: Cowardly refusing to overwrite the input file.")
         sys.exit(-4)
 
     # We're done! Just call the logic
     try:
         convert(args.inputname, output, inputType, outputType)
     except:
-        print("[ERROR]: Conversion program errored. This could be because a bug slipped" +
+        eprint("[ERROR]: Conversion program errored. This could be because a bug slipped" +
               " past the argparser, or it could be because you specified a bad input type." +
               " I'm printing the error below for your reference.")
-        print("\n")
+        eprint("\n")
         raise
 
 

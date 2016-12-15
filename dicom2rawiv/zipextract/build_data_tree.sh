@@ -67,8 +67,8 @@ fi
 # If $3 shows up, the user might have word split a directory by accident:
 # "Skull" "Atlas" "/path/to/work".
 if [ ! -z "${3+x}" ]; then
-    echo "Warning: Argument 3 is not empty. Are your directories quoted correctly?"
-    echo "Sleeping 3 seconds to allow user to quit Ctrl+C..."
+    echo "Warning: Argument 3 is not empty. Are your directories quoted correctly?" >> /dev/stderr
+    echo "Sleeping 3 seconds to allow user to quit Ctrl+C..." >> /dev/stderr
     sleep 3
 fi
 
@@ -138,12 +138,12 @@ find $(pwd) -type d | while read DIR; do #Loop over all directories in pwd
 
     # If we find a numeric-only name, this directory might have already been unpacked
     if [[ "$(basename "$DIR")" != *[!0-9]* ]]; then
-        echo "[WARN]: Numeric directory name found!"
-        echo "Have you already partially processed this tree?"
+        echo "[WARN]: Numeric directory name found!"  >> /dev/stderr
+        echo "Have you already partially processed this tree?" >> /dev/stderr
         continue
     # If we find SynapseMediaSets, we need to remove it and skip it so we don't try to walk it by mistake
     elif [ "$(basename "$DIR")" = "SynapseMediaSets" ]; then
-        echo "[WARN]: Found SynapseMediaSet in directory. Culling..."
+        echo "[WARN]: Found SynapseMediaSet in directory. Culling..." >> /dev/stderr
         rm -rf "$DIR"
         continue
     fi
@@ -206,8 +206,8 @@ cat "$DIRDIR_FILE" | while read DIR; do #Loop over all directories in pwd
     fi
 
     if [ ! -d "DICOMUNC" ]; then
-        echo "[ ERR ] DICOMUNC not found!"
-        echo "In path $DIR"
+        echo "[ ERR ] DICOMUNC not found!" >> /dev/stderr
+        echo "In path $DIR" >> /dev/stderr
         exit 1
     fi
 
