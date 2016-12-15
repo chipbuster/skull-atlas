@@ -16,23 +16,26 @@ set -euo pipefail #BASH STRICT MODE ON
 
 ## You need to modify the variables in this section to fit your system/install
 
+# Path to script-this does not work on MacOS and needs to be manually specified
+export SCRIPTDIR="$(dirname "$(readlink -f "$0")")"
+
 # The binary directory of the skull atlas output directory. Needs to be exported
 # so that helper functions can see it.
-#export BINDIR="/home/chipbuster/tmp/skatbld/bin"
-export BINDIR="/workspace/skull-atlas/code/install/bin"
+export BINDIR="/home/chipbuster/tmp/skatbld/bin"
+#export BINDIR="/workspace/skull-atlas/code/install/bin"
 
 # The directory of the source Box tree
-#BOXDIR="/home/chipbuster//NASpinny/UTBox/Skull Atlas"
-BOXDIR="/workspace/skull-atlas/data/boxData"
+BOXDIR="/home/chipbuster//NASpinny/UTBox/Skull Atlas"
+#BOXDIR="/workspace/skull-atlas/data/boxData"
 
 # The working directory where the files will be unpacked to and worked on
-#WORKDIR="/mnt/spinny/CVC/data-skulls"
-WORKDIR="/workspace/skull-atlas/data/workingData"
+WORKDIR="/mnt/spinny/CVC/data-skulls"
+#WORKDIR="/workspace/skull-atlas/data/workingData"
 
 # The number of CPUs to use. Both CPU count and memory can become an issue here
 # I recommend no more than 4 CPU cores per 16 GB RAM free (not tied up by
 # other programs) up to your number of logical CPUs
-NCPU=16
+NCPU=8
 
 ####################################
 ## HELPER FUNCTIONS AND VARIABLES ##
@@ -50,25 +53,6 @@ timestamp_msg(){
     echo "$1"
     echo "======================================="
 }
-
-# Xargs commands must be written as one-liners. If this is not possible,
-# we can create a function that does what we want and then export it
-precurate_one(){
-    IMAGE_IN="$1"
-    IMAGE_OUT="$("$BINDIR/outputName" "$IMAGE_IN" "precurate")"
-
-    "$BINDIR/precurate" "$IMAGE_IN" "$IMAGE_OUT" 100
-}
-export -f precurate_one
-
-thresholdGrow_one(){
-    IMAGE_IN="$1"
-    IMAGE_OUT="$("$BINDIR/outputName" "$IMAGE_IN" "threshold")"
-
-    "$BINDIR/growskull" "$IMAGE_IN" "$IMAGE_OUT" 200 250
-}
-export -f thresholdGrow_one
-
 
 #####################
 ## PIPELINE DRIVER ##
@@ -97,13 +81,13 @@ find "$WORKDIR" -name '*.rawiv' -print0 | "$XARGS" -I % -n 1 -0 -P $NCPU "$BINDI
 
 # Precurate the images by using Nathan's poorly commented C++ code
 timestamp_msg "Precurating images: select largest connected component above certain isovalue"
-find "$WORKDIR" -name '*.inr' -print0 | "$XARGS" -I % -n 1 -0 -P $NCPU precurate_one %
+find "$WORKDIR" -name '*.inr' -print0 | "$XARGS" -I % -n 1 -0 -P $NCPU pipeline_precurate %
 
 # Convert the images into rawiv to prepare for thresholding and raster expansion
 find "$WORKDIR" -name '*_precurate.inr' -print0 | "$XARGS" -I % -n 1 -0 -P $NCPU "$BINDIR/volimg_convert" % -of rawiv
 
 # Threshold the skull voxels by using Kevin's shitty C++ code
-find "$WORKDIR" -name '*_precurate.rawiv' -print0 | "$XARGS" -I % -n 1 -0 -P $NCPU thresholdGrow_one %
+find "$WORKDIR" -name '*_precurate.rawiv' -print0 | "$XARGS" -I % -n 1 -0 -P $NCPU pipeline_thresholdGrow %
 
 # Use conversion script to turn precurated skulls into Nifti images
 find "$WORKDIR" -name '*_threshold.inr' -print0 | "$XARGS" -I % -n 1 -0 -P $NCPU "$BINDIR/volimg_convert" % -of nii
