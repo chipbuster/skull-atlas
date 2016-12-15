@@ -18,18 +18,21 @@ set -euo pipefail #BASH STRICT MODE ON
 
 # The binary directory of the skull atlas output directory. Needs to be exported
 # so that helper functions can see it.
-export BINDIR="/home/chipbuster/tmp/skatbld/bin"
+#export BINDIR="/home/chipbuster/tmp/skatbld/bin"
+export BINDIR="/workspace/skull-atlas/code/install/bin"
 
 # The directory of the source Box tree
-BOXDIR="/home/chipbuster//NASpinny/UTBox/Skull Atlas"
+#BOXDIR="/home/chipbuster//NASpinny/UTBox/Skull Atlas"
+BOXDIR="/workspace/skull-atlas/data/boxData"
 
 # The working directory where the files will be unpacked to and worked on
-WORKDIR="/mnt/spinny/CVC/data-skulls"
+#WORKDIR="/mnt/spinny/CVC/data-skulls"
+WORKDIR="/workspace/skull-atlas/data/workingData"
 
 # The number of CPUs to use. Both CPU count and memory can become an issue here
 # I recommend no more than 4 CPU cores per 16 GB RAM free (not tied up by
 # other programs) up to your number of logical CPUs
-NCPU=8
+NCPU=16
 
 ####################################
 ## HELPER FUNCTIONS AND VARIABLES ##
