@@ -67,7 +67,7 @@ You will need:
   * libgmp
   * libmpfr
   * [freeglut3](http://freeglut.sourceforge.net/)
-  * [CGAL](http://www.cgal.org/) (v4.8.1 or greater)
+  * [CGAL](http://www.cgal.org/) (v4.8.x)
   * Eigen3
   
 If you're on Ubuntu, you can find install commands for all of these packages
@@ -80,6 +80,9 @@ linux distributions. freeglut can be tricky to find, but it usually exists.
 [LibIGL](https://github.com/libigl/libigl) is also required, but it is
 already provided in this source code (as a git submodule), so you do not
 need to download/install it unless you want to.
+
+CGAL 4.9 has a bug in it that stalls our pipeline, so it is not recommended
+as of right now. 4.9.1 might fix this issue.
 
 ##### Python and Friends
 

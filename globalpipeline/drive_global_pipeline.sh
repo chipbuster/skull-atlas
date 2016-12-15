@@ -37,6 +37,12 @@ WORKDIR="/mnt/spinny/CVC/data-skulls"
 # other programs) up to your number of logical CPUs
 NCPU=8
 
+# Preserve all images in the pipeline for later examination. If this is any
+# other string than "true", the pipeline will periodically cull intermediate
+# images from the disk to save space
+# PRESERVE_INTERMEDIATES="true"
+PRESERVE_INTERMEDIATES="nope"
+
 ####################################
 ## HELPER FUNCTIONS AND VARIABLES ##
 ####################################
@@ -81,13 +87,24 @@ find "$WORKDIR" -name '*.rawiv' -print0 | "$XARGS" -I % -n 1 -0 -P $NCPU "$BINDI
 
 # Precurate the images by using Nathan's poorly commented C++ code
 timestamp_msg "Precurating images: select largest connected component above certain isovalue"
-find "$WORKDIR" -name '*.inr' -print0 | "$XARGS" -I % -n 1 -0 -P $NCPU pipeline_precurate %
+find "$WORKDIR" -name '*.inr' -print0 | "$XARGS" -I % -n 1 -0 -P $NCPU "$SCRIPTDIR"/pipeline_precurate %
 
 # Convert the images into rawiv to prepare for thresholding and raster expansion
+timestamp_msg "Converting precurated image to RawIV for thresholding"
 find "$WORKDIR" -name '*_precurate.inr' -print0 | "$XARGS" -I % -n 1 -0 -P $NCPU "$BINDIR/volimg_convert" % -of rawiv
 
 # Threshold the skull voxels by using Kevin's shitty C++ code
-find "$WORKDIR" -name '*_precurate.rawiv' -print0 | "$XARGS" -I % -n 1 -0 -P $NCPU pipeline_thresholdGrow %
+timestamp_msg "Thresholding skull voxels"
+find "$WORKDIR" -name '*_precurate.rawiv' -print0 | "$XARGS" -I % -n 1 -0 -P $NCPU "$SCRIPTDIR"/pipeline_thresholdGrow %
 
 # Use conversion script to turn precurated skulls into Nifti images
-find "$WORKDIR" -name '*_threshold.inr' -print0 | "$XARGS" -I % -n 1 -0 -P $NCPU "$BINDIR/volimg_convert" % -of nii
+timestamp_msg "Converting thresholded rawivs to Nifti"
+find "$WORKDIR" -name '*_filtered.inr' -print0 | "$XARGS" -I % -n 1 -0 -P $NCPU "$BINDIR/volimg_convert" % -of nii
+
+# We have a *lot* of garbage in the directory now. Find the unneeded stuff and kill it off
+if [ ! "$PRESERVE_INTERMEDIATES" = "true" ]; then
+    find "$WORKDIR" -name '*.inr' -delete
+    find "$WORKDIR" -name '*_precurate.rawiv' -delete
+fi
+
+

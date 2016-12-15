@@ -174,7 +174,6 @@ int main(int argc, char* argv[]){
     cout << "Alt Usage: " << argv[0] << " input_rawiv seed_threshold bone_threshold" << endl;
     cout << "(Output will be input filename with '_filtered' appended)" << endl;
 
-
     return 1;
   }
 
