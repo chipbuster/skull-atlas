@@ -171,7 +171,6 @@ int main(int argc, char* argv[]){
     cout << "See comments at the top of growskull.cpp for more details." << endl << endl;
 
     cout << "Usage: " << argv[0] << " input_rawiv output_rawiv seed_threshold bone_threshold" << endl << endl;
-    cout << "Alt Usage: " << argv[0] << " input_rawiv seed_threshold bone_threshold" << endl;
     cout << "(Output will be input filename with '_filtered' appended)" << endl;
 
     return 1;
@@ -191,18 +190,6 @@ int main(int argc, char* argv[]){
     outFilename = string(argv[2]);
     initThreshold = atoi(argv[3]);
     lowThreshold = atoi(argv[4]);
-  }
-  else if (argc == 4){
-    inFilename = string(argv[1]);
-
-    // Calculate output filename based on input
-
-    size_t lastindex = inFilename.find_last_of(".");
-    string rawname = inFilename.substr(0,lastindex);
-    outFilename = rawname + "_filtered.rawiv";
-
-    initThreshold = atoi(argv[2]);
-    lowThreshold = atoi(argv[3]);
   }else{
     return -1; // Keep compiler from warning about uninit'd vals
   }

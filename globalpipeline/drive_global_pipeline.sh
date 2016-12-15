@@ -41,7 +41,7 @@ NCPU=8
 # other string than "true", the pipeline will periodically cull intermediate
 # images from the disk to save space
 # PRESERVE_INTERMEDIATES="true"
-PRESERVE_INTERMEDIATES="nope"
+PRESERVE_INTERMEDIATES="true"
 
 ####################################
 ## HELPER FUNCTIONS AND VARIABLES ##
@@ -102,7 +102,7 @@ timestamp_msg "Converting thresholded rawivs to Nifti"
 find "$WORKDIR" -name '*_filtered.inr' -print0 | "$XARGS" -I % -n 1 -0 -P $NCPU "$BINDIR/volimg_convert" % -of nii
 
 # We have a *lot* of garbage in the directory now. Find the unneeded stuff and kill it off
-if [ ! "$PRESERVE_INTERMEDIATES" = "true" ]; then
+if [ "$PRESERVE_INTERMEDIATES" != "true" ]; then
     find "$WORKDIR" -name '*.inr' -delete
     find "$WORKDIR" -name '*_precurate.rawiv' -delete
 fi
