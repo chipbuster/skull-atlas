@@ -1,3 +1,6 @@
 [submodule "extdeps/libigl"]
 	path = extdeps/libigl
 	url = https://github.com/libigl/libigl.git
+[submodule "extdeps/niftyreg"]
+	path = extdeps/niftyreg
+	url = git@github.com:chipbuster/niftyreg.git
