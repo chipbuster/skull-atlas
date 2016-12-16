@@ -1,7 +1,14 @@
 cmake_minimum_required (VERSION 3.2.0)
-project (Skull_atlas)
+project (Skull_Atlas)
 
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
+# I don't know how to do this yet. ExternalProject trggers an install step,
+# which doesnt' work if prefix is not specified. Add_subdirectory breaks
+# build because relative include paths get messed up (seems like 
+# maintainers were not expecting this to be a subproject)
+
+# Need to read http://stackoverflow.com/q/37838786/2914377 and implement.
+
+# add_subdirectory("${PROJECT_SOURCE_DIR}/extdeps")
 
 # Locate custom find modules (e.g. CGAL)
 # set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake_modules")

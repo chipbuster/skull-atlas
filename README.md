@@ -115,6 +115,7 @@ will additionally need:
   * sqlite3
   * matlab
   * an OpenGL-enabled web browser
+  * CUDA
 
 ### Building
 
@@ -130,6 +131,10 @@ all of the executables that the project generates, including scripts.
 **Important note: the repo currently assumes that you have all of the necessary
 prereqs, e.g. (CGAL, MPFR, GMP, Matlab) installed on your computer. There is no
 dependency building yet.**
+
+The external projects should build without any issues under the default settings.
+However, you can choose to accelerate them if you have the required software
+installed--details can be found in the README.md in the `extdeps` directory.
 
 ### Testing
 
