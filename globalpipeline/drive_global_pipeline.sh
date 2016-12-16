@@ -75,11 +75,11 @@ echo "to complete before killing it as a stuck job."
 
 # Extract zip files from raw data directory to working directory
 timestamp_msg "Extracting DICOM data from zip files."
-"$BINDIR/build_data_tree" "$BOXDIR" "$WORKDIR"
+"$BINDIR/build_data_tree" "$BOXDIR" "$WORKDIR" > /dev/null
 
 # Take DICOM Images and extract volumetric images from them.
 timestamp_msg "Converting DICOM to volumetric image."
-"$BINDIR/dicom_to_rawiv" "$WORKDIR"
+"$BINDIR/dicom_to_rawiv" "$WORKDIR" > /dev/null
 
 # Take each RawIV image and convert it to INR for the precurate binary
 timestamp_msg "Converting rawiv to inr in preparation for precuration"

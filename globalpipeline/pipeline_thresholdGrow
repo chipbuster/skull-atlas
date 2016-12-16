@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 IMAGE_IN="$1"
-IMAGE_OUT="$("$BINDIR/outputName" "$IMAGE_IN" "")"
+IMAGE_OUT="$("$BINDIR/outputName" "$IMAGE_IN" "threshold")"
 
 "$BINDIR/growskull" "$IMAGE_IN" "$IMAGE_OUT" 200 250 > /dev/null
 
