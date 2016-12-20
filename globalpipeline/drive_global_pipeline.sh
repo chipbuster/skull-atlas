@@ -99,7 +99,7 @@ find "$WORKDIR" -name '*_precurate.rawiv' -print0 | "$XARGS" -I % -n 1 -0 -P $NC
 
 # Use conversion script to turn precurated skulls into Nifti images
 timestamp_msg "Converting thresholded rawivs to Nifti"
-find "$WORKDIR" -name '*_filtered.inr' -print0 | "$XARGS" -I % -n 1 -0 -P $NCPU "$BINDIR/volimg_convert" % -of nii
+find "$WORKDIR" -name '*_threshold.rawiv' -print0 | "$XARGS" -I % -n 1 -0 -P $NCPU "$BINDIR/volimg_convert" % -of nii
 
 # We have a *lot* of garbage in the directory now. Find the unneeded stuff and kill it off
 if [ "$PRESERVE_INTERMEDIATES" != "true" ]; then
@@ -107,4 +107,4 @@ if [ "$PRESERVE_INTERMEDIATES" != "true" ]; then
     find "$WORKDIR" -name '*_precurate.rawiv' -delete
 fi
 
-
+## NOW WHAT?
