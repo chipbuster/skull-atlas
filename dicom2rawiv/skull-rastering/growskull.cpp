@@ -194,6 +194,12 @@ int main(int argc, char* argv[]){
     return -1; // Keep compiler from warning about uninit'd vals
   }
 
+  if (initThreshold < lowThreshold){
+    std::cerr << "[WARN]: Your seed threshold is lower than your boundary "
+              << "threshold. Usually you're supposed to do it the other way"
+              << "around." << endl;
+  }
+
   RawivImage img = RawivImage(inFilename);
   CoordSet knownVoxels = CoordSet();
   CoordQ activeVoxels; //Used for voxels that have been discovered but not BFSed
