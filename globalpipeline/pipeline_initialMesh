@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+IMAGE_IN="$1"
+IMAGE_OUT="$(dirname "$IMAGE_IN")"/"$(basename -s '.inr' "$IMAGE_IN")".obj
+
+# Replace suffix with obj and move path to MESHES directory
+MESH_OUT=$(echo "$IMAGE_OUT" | sed 's/VOLIMG/MESHES/g')
+
+"$BINDIR/inr2obj" "$IMAGE_IN" "$MESH_OUT" 0 
