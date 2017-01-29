@@ -45,6 +45,13 @@ git clone --recursive https://github.com/chipbuster/skull-atlas.git
 Not cloning recursively may lead to errors unless certain parts of the build
 are disabled.
 
+If you have already cloned, you can get the submodules by doing
+
+```
+git submodule init
+git submodule update
+```
+
 ### Prerequisites
 
 The list of prerequisite software for this project is incredibly large and
@@ -95,7 +102,7 @@ You will need:
   * [rpy2](https://rpy2.bitbucket.io/)
 
 If you are using Python3 version 3.3 or older, you will also need to install
-the backported enum package [`enum34`](https://pypi.python.org/pypi/enum34)
+the backported enum package [`enum34`](https://pypi.python.org/pypi/enum34).
   
 ##### R and Friends
 

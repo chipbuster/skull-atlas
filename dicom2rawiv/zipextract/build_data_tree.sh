@@ -109,7 +109,7 @@ if [ $IN_DIR_UNPACK = "NO" ]; then
 fi
 
 # Set up a directory to hold softlinks to patients in tree
-LINKDIR="$(dirname "$WORKDIR")/patient_links"
+LINKDIR="${WORKDIR}/patient_links"
 
 #########################
 ## DIRECTORY DIRECTORY ##

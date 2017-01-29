@@ -115,3 +115,4 @@ timestamp_msg "Meshing thresholded inr"
 find "$WORKDIR" -name '*_threshold.inr' -print0 |  "$XARGS" -I % -n 1 -0 -P $NCPU "$SCRIPTDIR/pipeline_initialMesh" %
 
 ## NOW WHAT?
+timestamp_msg "Pipeline Finished"
