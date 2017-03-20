@@ -3,4 +3,4 @@
 	url = https://github.com/libigl/libigl.git
 [submodule "extdeps/niftyreg"]
 	path = extdeps/niftyreg
-	url = git@github.com:chipbuster/niftyreg.git
+	url = https://github.com/chipbuster/niftyreg.git

@@ -107,4 +107,12 @@ if [ "$PRESERVE_INTERMEDIATES" != "true" ]; then
     find "$WORKDIR" -name '*_precurate.rawiv' -delete
 fi
 
+timestamp_msg "Converting thresholded rawivs to inr"
+find "$WORKDIR" -name '*_threshold.rawiv' -print0 |  "$XARGS" -I % -n 1 -0 -P $NCPU "$BINDIR/volimg_convert" % -of inr
+
+# initialMesh script generates meshes into the MESHES directory
+timestamp_msg "Meshing thresholded inr"
+find "$WORKDIR" -name '*_threshold.inr' -print0 |  "$XARGS" -I % -n 1 -0 -P $NCPU "$SCRIPTDIR/pipeline_initialMesh" %
+
 ## NOW WHAT?
+timestamp_msg "Pipeline Finished"
