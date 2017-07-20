@@ -1,14 +1,20 @@
 skullviewer.view.Finder = Backbone.View.extend({
 
     init: function(options) {
-        //TODO
+        
+        var element = $(this.el),
+            viewer = options.viewer,
+            select_file = $('#select-file', element);
+
+        this.select_file = select_file;
+        this.viewer = viewer;
+
         return this;
     },
 
     loadFile: function(event) {
         var file = event.target.files[0];
-        console.log(file)
-        //TODO
+        this.viewer.loadFile(file);
     },
     
     events: {
