@@ -21,7 +21,7 @@ skullviewer.Viewer = Backbone.View.extend({
         scene.add( cube );
         scene.background = new THREE.Color( 0xfcfcfc );
 
-        camera.position.z = 100;
+        camera.position.z = 5;
 
         var animate = function () {
             requestAnimationFrame( animate );
