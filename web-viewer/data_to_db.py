@@ -11,8 +11,8 @@ from viewer.models import Skull, Deformation, SimilarityScore
 
 
 models_path = './data/models/'
-deformation_path = './data/deformation'
-thumbnails_path = './data/thumbnails'
+deformation_path = './data/deformation/'
+thumbnails_path = './data/thumbnails/'
  
 def load_similarity():
 	path = './similarity.txt'
@@ -46,17 +46,19 @@ def load_skull():
 		elif skull_type == 'q':
 			skull_type = 'injured'
 		else:
+			skull_type = 'healthy'
 			print("no such type in load_skull")
 		skull = Skull.objects.get_or_create(identity=model_id, skull_type = skull_type, obj_path = models_path + model)
 
 	for thumbnail in os.listdir(thumbnails_path):
-		if len(thumbnails) < 5 or thumbnails[-4:] != 'png':
+		if len(thumbnail) < 5 or thumbnail[-4:] != 'png':
 			continue
 
-		thumbnail_name = thumbnails[:-4]
+		thumbnail_name = thumbnail[:-4]
 		try:
 			skull = Skull.objects.get(identity=thumbnail_name)
-			skull.thumbnail = 
+			skull.thumbnail = Image.open(thumbnails_path + thumbnail)
+			
 		except:
 			print("thumbnail match fails in load_skull")
 
@@ -66,11 +68,10 @@ def load_deformation():
 		if len(deform) < 5 or deform[-4:] != '.obj':
 			continue
 		file_name = deform[:-4]
-		skull1_identity = file_name
-		skull2_identity = file_name
-		frame = file_name
+		skull1_identity = 'result'
+		skull2_identity = 'query'
+		frame = int(file_name)
 		deform = Deformation.objects.get_or_create(skull1_identity = skull1_identity, skull2_identity=skull2_identity, frame_num = frame, obj_path = deformation_path + deform)
-
 
 def main():
     load_similarity()

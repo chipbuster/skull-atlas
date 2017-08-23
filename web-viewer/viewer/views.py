@@ -10,10 +10,15 @@ from .models import Skull, SimilarityScore, Deformation
 import viewer.utils
 import math
 
-def show_skull(request):
-	skull_each_page = 20
+def index(request):
+   template = loader.get_template('viewer/index.html')
+   context = {}
+   return HttpResponse(template.render(context, request))
+
+def show_skulls(request):
+	skull_each_page = 8
 	if request.method == 'GET':
-		page = request.GET.get('page','-1')
+		page = int(request.GET.get('page','-1'))
 		skull_type = request.GET.get('type', 'healthy')
 
 		skulls = Skull.objects.all() 
@@ -28,13 +33,24 @@ def show_skull(request):
 
 		result_skulls = skulls[start_idx:end_idx]
 
-		result_skulls = [{'name':s.name,'thumbnail':s.thumbnail,'identity':s.identity,'obj_path':s.obj_path,'vertices':s.vertices} for s in result_skulls]
+		result = []
+		for s in result_skulls:
+			res = {
+				'name':s.name,
+				'identity':s.identity,
+				'obj_path':s.obj_path,
+				'vertices':s.vertices,
+			}
+			dec_f = open(s.obj_path_decimated,'r')
+			res['obj_decimated'] = dec_f.read()
+			dec_f.close()
+			result.append(res)
 
 		context = {
 			'status':1,
-			'num': len(result_skulls),
+			'num': len(result),
 			'max_page': max_page,
-			'skulls':result_skulls,
+			'skulls':result,
 		}
 	else:
 		print("show_skull: request method should be get")
@@ -84,7 +100,7 @@ def skull_detail(request):
 			'status':0
 		}
 
-	return HttpResponse(template.render(context, request))
+	return HttpResponse(context)
 
 
 def skull_deform_frame(request):
@@ -96,18 +112,25 @@ def skull_deform_frame(request):
 		skull1 = Skull.objects.get(identity=skull1_identity)
 		skull2 = Skull.objects.get(identity=skull2_identity)
 
-		deform = Deformation.objects.get(skull1_identity = skull1_identity, skull2_identity = skull2_identity, frame_num=frame_num)
-		deform_obj = open(deform.obj_path, 'r')
-
-		context = {
-			'status':1,
-			'obj': deform_obj.read(),
-			'skull1_name': skull1.name,
-			'skull2_name': skull2.name,
-			'frame': frame_num + 1,
-		}
-	
-		deform_obj.close()
+		try:
+			deform = Deformation.objects.get(skull1_identity = skull1_identity, skull2_identity = skull2_identity, frame_num=frame_num)
+			max_frame = len(Deformation.objects.filter(skull1_identity = skull1_identity, skull2_identity = skull2_identity))
+			deform_obj = open(deform.obj_path, 'r')
+			context = {
+				'status':1,
+				'obj': deform_obj.read(),
+				'skull1_name': skull1.name,
+				'skull2_name': skull2.name,
+				'frame': frame_num + 1,
+			}
+			deform_obj.close()
+		except:
+			context = {
+				'status':1,
+				'skull1_name': skull1.name,
+				'skull2_name': skull2.name,
+				'frame': 0,
+			}
 
 	else:
 		print("skull_deform_frame: request method should be get")
@@ -119,10 +142,11 @@ def skull_deform_frame(request):
 
 
 def similar_skull(request):
-	template = loader.get_template('viewer/index.html')
 	if request.method == 'GET':
+
 		skull1_identity = request.GET.get('skull1', '-1')
 		skull2_identity = request.GET.get('skull2', '-1')
+
 		skull1 = Skull.objects.get(identity=skull1_identity)
 		skull2 = Skull.objects.get(identity=skull2_identity)
 		# skull1_vertices = decode_float_list(skull1.vertices)
@@ -132,20 +156,21 @@ def similar_skull(request):
 
 		context = {
 			'status':1,
-			'skull1_obj': skull1_obj,
+			'skull1_obj': skull1_obj.read(),
 			'skull1_name':	skull1.name,
-			'skull2_obj': skull2_obj,
+			'skull2_obj': skull2_obj.read(),
 			'skull2_name': skull2.name,
 		}
 
 		skull1_obj.close()
 		skull2_obj.close()
+
 	else:
 		print("similar_skull: request method should be get")
 		context = {
 			'status':0
 		}
-	return HttpResponse(template.render(context, request))
+	return JsonResponse(context)
 
 
 
