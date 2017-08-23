@@ -3,7 +3,8 @@ from django.conf.urls import url
 from . import views
 
 urlpatterns = [
-  url(r'^$', views.index, name='index'),
-  url(r'^skull$', views.skull, name='skull'),
-  url(r'^deform$', views.deform, name='deform')
+  	url(r'^deform/$', views.skull_deform_frame, name='deform'),
+  	url(r'^similar/$', views.similar_skull, ),
+  	url(r'^skull_detail/$', views.skull_detail, name=''),
+  	url(r'^$', views.show_skull, name='skulls'),
 ]
