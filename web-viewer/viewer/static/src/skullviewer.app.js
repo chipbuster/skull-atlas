@@ -23,6 +23,7 @@ skullviewer.App = Backbone.View.extend({
             manager = this.manager;
 
         manager.init({
+            views: views,
             console: $('#console')
         });
 

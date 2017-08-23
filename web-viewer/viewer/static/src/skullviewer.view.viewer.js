@@ -26,6 +26,11 @@ skullviewer.view.Viewer = Backbone.View.extend({
         return this;
     },
 
+    renderSkull: function (name, obj) {
+        this.qscene.renderSkull(name, obj);
+        this.rscene.renderSkull(name, obj);
+    },
+
     onMousedown: function (event, ui) {
         //TODO
         return this;
