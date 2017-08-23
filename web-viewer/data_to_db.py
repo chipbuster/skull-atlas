@@ -5,7 +5,7 @@ import os
 from PIL import Image
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "skullviewer.settings")
 if django.VERSION >= (1, 7):#自动判断版本
-    django.setup()
+	django.setup()
 
 from viewer.models import Skull, Deformation, SimilarityScore
 
@@ -48,7 +48,8 @@ def load_skull():
 		else:
 			skull_type = 'healthy'
 			print("no such type in load_skull")
-		skull = Skull.objects.get_or_create(identity=model_id, skull_type = skull_type, obj_path = models_path + model)
+		skull = Skull.objects.get_or_create(identity=model_id, skull_type = skull_type,
+			obj_decimated=models_path + model)
 
 	for thumbnail in os.listdir(thumbnails_path):
 		if len(thumbnail) < 5 or thumbnail[-4:] != 'png':
@@ -71,13 +72,22 @@ def load_deformation():
 		skull1_identity = 'result'
 		skull2_identity = 'query'
 		frame = int(file_name)
-		deform = Deformation.objects.get_or_create(skull1_identity = skull1_identity, skull2_identity=skull2_identity, frame_num = frame, obj_path = deformation_path + deform)
+		deform = Deformation.objects.get_or_create(skull1_identity = skull1_identity, skull2_identity=skull2_identity, frame_num = frame, obj_decimated = deformation_path + deform)
+
+def clear_data():
+	Skull.objects.all().delete()
+	print("skull deleted")
+	SimilarityScore.objects.all().delete()
+	print("similarity deleted")
+	Deformation.objects.all().delete()
+	print("deformation deleted")
 
 def main():
-    load_similarity()
-    load_skull()
-    load_deformation()
+	clear_data()
+	load_similarity()
+	load_skull()
+	load_deformation()
  
 if __name__ == "__main__":
-    main()
-    print('Done!')
+	main()
+	print('Done!')

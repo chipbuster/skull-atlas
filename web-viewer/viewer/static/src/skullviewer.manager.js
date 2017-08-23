@@ -35,7 +35,6 @@ skullviewer.Manager = Backbone.View.extend({
         var skull1_id = 'query';
         var skull2_id = 'result';
         $.get('similar/?skull1=query&skull2=result', function (data) {
-            console.log(data);
             context.loadObjToScene(skull1_id, data['skull1_obj']);
             context.loadObjToScene(skull2_id, data['skull2_obj']);
         });
@@ -48,13 +47,14 @@ skullviewer.Manager = Backbone.View.extend({
         var skull2_id = 'query';
         var callback = function (data) {
             frame = parseInt(data['frame']);
+            maxframe = parseInt(data['max_frame'])
             console.log(frame);
-            context.loadObjToScene('result', data['obj']);
-            if (frame != 0) {
-                $.get('deform/?skull1='+skull1_id+'&skull2='+skull2_id+'&frame='+frame, callback)
+            context.loadObjToScene('result', data['obj_decimated']);
+            if (frame <= maxframe) {
+                $.get('deform/?skull1='+skull1_id+'&skull2='+skull2_id+'&frame='+frame+'&dec=1', callback)
             }
         };
-        $.get('deform/?skull1='+skull1_id+'&skull2='+skull2_id+'&frame=1', callback);
+        $.get('deform/?skull1='+skull1_id+'&skull2='+skull2_id+'&frame=1&dec=1', callback);
     },
 
     loadObjToScene: function(id, fileContents) {

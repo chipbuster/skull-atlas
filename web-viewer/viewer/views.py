@@ -109,21 +109,35 @@ def skull_deform_frame(request):
 		skull1_identity = request.GET.get('skull1','-1')
 		skull2_identity = request.GET.get('skull2', '-1')
 		frame_num = int(request.GET.get('frame', '-1'))
+		is_dec = int(request.GET.get('dec'))
 		skull1 = Skull.objects.get(identity=skull1_identity)
 		skull2 = Skull.objects.get(identity=skull2_identity)
 
 		try:
-			deform = Deformation.objects.get(skull1_identity = skull1_identity, skull2_identity = skull2_identity, frame_num=frame_num)
-			max_frame = len(Deformation.objects.filter(skull1_identity = skull1_identity, skull2_identity = skull2_identity))
-			deform_obj = open(deform.obj_path, 'r')
-			context = {
-				'status':1,
-				'obj': deform_obj.read(),
-				'skull1_name': skull1.name,
-				'skull2_name': skull2.name,
-				'frame': frame_num + 1,
-			}
-			deform_obj.close()
+			if is_dec == 1:
+				deform = Deformation.objects.get(skull1_identity = skull1_identity, skull2_identity = skull2_identity, frame_num=frame_num)
+				max_frame = len(Deformation.objects.filter(skull1_identity = skull1_identity, skull2_identity = skull2_identity))
+				deform_obj = open(deform.obj_decimated, 'r')
+				context = {
+					'status':1,
+					'obj_decimated': deform_obj.read(),
+					'skull1_name': skull1.name,
+					'skull2_name': skull2.name,
+					'frame': frame_num + 1,
+					'max_frame': max_frame,
+				}
+				deform_obj.close()
+
+			else:
+				deform = Deformation.objects.get(skull1_identity = skull1_identity, skull2_identity = skull2_identity, frame_num=frame_num)
+				deform_obj = open(deform.obj_path, 'r')
+				context = {
+					'status':1,
+					'obj': deform_obj.read(),
+					'skull1_name': skull1.name,
+					'skull2_name': skull2.name,
+				}
+				deform_obj.close()
 		except:
 			context = {
 				'status':1,
@@ -151,8 +165,8 @@ def similar_skull(request):
 		skull2 = Skull.objects.get(identity=skull2_identity)
 		# skull1_vertices = decode_float_list(skull1.vertices)
 		# skull2_vertices = decode_float_list(skull2.vertices)
-		skull1_obj = open(skull1.obj_path, 'r')
-		skull2_obj = open(skull2.obj_path, 'r')
+		skull1_obj = open(skull1.obj_decimated, 'r')
+		skull2_obj = open(skull2.obj_decimated, 'r')
 
 		context = {
 			'status':1,
