@@ -47,9 +47,12 @@ skullviewer.view.Viewer = Backbone.View.extend({
         this.rscene.render();
         this.qscene.render();
     },
-    renderSkull: function (name, obj) {
-        this.rscene.renderSkull(name, obj.clone());
-        this.qscene.renderSkull(name, obj.clone());
+    renderSkull: function (id, obj) {
+        if (id==='query') {
+            this.qscene.renderSkull(name, obj);
+        } else {
+            this.rscene.renderSkull(name, obj);
+        }
     },
 
     onMousedown: function (event, ui) {

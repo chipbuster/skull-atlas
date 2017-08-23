@@ -49,7 +49,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'skullviewer.urls'
+ROOT_URLCONF = 'viewer.urls'
 
 TEMPLATES = [
     {

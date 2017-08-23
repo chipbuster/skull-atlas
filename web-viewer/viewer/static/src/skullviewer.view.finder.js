@@ -17,13 +17,18 @@ skullviewer.view.Finder = Backbone.View.extend({
         this.manager.loadFile(file);
     },
     
-    testClick: function(event) {
-        this.manager.testClick();
+    loadClick: function(event) {
+        this.manager.loadClick();
+    },
+
+    deformClick: function(event) {
+        this.manager.deformClick();
     },
 
     events: {
         'change #select-file': 'loadFile',
-        'click #test-btn': 'testClick'
+        'click #load-btn': 'loadClick',
+        'click #deform-btn': 'deformClick'
     }
 
 });

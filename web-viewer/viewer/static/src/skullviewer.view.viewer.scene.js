@@ -62,7 +62,7 @@ skullviewer.view.viewer.Scene = Backbone.View.extend({
         var geometry = new THREE.BoxGeometry( 20, 20, 20 );
         var material = new THREE.MeshBasicMaterial( { color: 0x2c2c2c , wireframe: true} );
         var cube = new THREE.Mesh( geometry, material );
-        cube.name = "temp_cube";
+        cube.name = id;
         scene.add(cube);
         scene.add(light);
 
@@ -85,7 +85,7 @@ skullviewer.view.viewer.Scene = Backbone.View.extend({
 
     renderSkull: function (name, obj) {
         console.log(this.id);
-        this.scene.remove(this.scene.getObjectByName('temp_cube'));
+        this.scene.remove(this.scene.getObjectByName(this.id));
         this.scene.add(obj);
         this.renderer.render(this.scene, this.camera);
     }

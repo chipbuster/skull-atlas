@@ -29,11 +29,32 @@ skullviewer.Manager = Backbone.View.extend({
         console.log('starting read');
     },
 
-    testClick: function() {
-        console.log('On test Click');
+    loadClick: function() {
+        console.log('On load Click');
+        var context = this;
+        $.get('skull?name=query', function (data) {
+            context.loadObjToScene('query', data);
+        });
+        $.get('skull?name=result', function (data) {
+            context.loadObjToScene('result', data);
+        });
     },
 
-    loadObjToScene: function(fileContents) {
+    deformClick: function() {
+        console.log('On deform Click');
+        var context = this;
+        var callback = function (data) {
+            frame = parseInt(data['frame']);
+            console.log(frame);
+            context.loadObjToScene('result', data['obj']);
+            if (frame != 0) {
+                $.get('deform?frame=' + frame, callback)
+            }
+        };
+        $.get('deform?frame=1', callback);
+    },
+
+    loadObjToScene: function(id, fileContents) {
         var OBJMaterial = new THREE.MeshPhongMaterial({color: 0xf0f0f0});
         var loader = new THREE.OBJLoader();
         var object = (loader.parse(fileContents)).children[0];
@@ -41,14 +62,8 @@ skullviewer.Manager = Backbone.View.extend({
         console.log(object);
         if (object instanceof THREE.Mesh) {
             object.material = OBJMaterial;
-            object.name = "query_mesh";
-            /*
-            var geometry = new THREE.BoxGeometry( 5, 5, 5 );
-            var material = new THREE.MeshBasicMaterial( { color: 0x2c2c2c , wireframe: true} );
-            var cube = new THREE.Mesh( geometry, material ); 
-            this.scene.add(cube);
-            */
-            this.views.viewer.renderSkull('test', object);
+            object.name = id;
+            this.views.viewer.renderSkull(id, object);
         }
     },
 
