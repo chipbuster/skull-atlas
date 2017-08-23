@@ -29,6 +29,10 @@ skullviewer.Manager = Backbone.View.extend({
         console.log('starting read');
     },
 
+    testClick: function() {
+        console.log('On test Click');
+    },
+
     loadObjToScene: function(fileContents) {
         var OBJMaterial = new THREE.MeshPhongMaterial({color: 0xf0f0f0});
         var loader = new THREE.OBJLoader();
