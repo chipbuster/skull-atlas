@@ -13,10 +13,10 @@ from viewer.models import Skull, Deformation, SimilarityScore
 models_path = './data/models/'
 deformation_path = './data/deformation/'
 thumbnails_path = './data/thumbnails/'
+similarity_path = './data/similarity.txt'
  
 def load_similarity():
-	path = './similarity.txt'
-	f = open(path, 'r')
+	f = open(similarity_path, 'r')
 	strs = f.read()
 
 	for sec in strs.split("?")[:-1]:
