@@ -16,19 +16,40 @@ skullviewer.view.Viewer = Backbone.View.extend({
         this.manager = manager;
 
         this.qscene.init({
-            viewer: viewer
+            viewer: viewer,
+            id: 'query'
         });
 
         this.rscene.init({
-            viewer: viewer
+            viewer: viewer,
+            id: 'result'
         });
 
         return this;
     },
 
+    sceneSync: function (id, camera, light) {
+        var toSyncCam = null;
+        var toSyncLight = null;
+        if (id === 'query') {
+            toSyncCam = this.rscene.camera;
+            toSyncLight = this.rscene.light;
+        }
+        else  {
+            toSyncCam = this.qscene.camera;
+            toSyncLight = this.qscene.light;
+        }            
+        
+        // toSync.position.copy(camera.position);
+        // toSync.lookAt(camera.target);
+        toSyncCam.copy(camera);
+        toSyncLight.copy(light);
+        this.rscene.render();
+        this.qscene.render();
+    },
     renderSkull: function (name, obj) {
-        this.qscene.renderSkull(name, obj);
-        this.rscene.renderSkull(name, obj);
+        this.rscene.renderSkull(name, obj.clone());
+        this.qscene.renderSkull(name, obj.clone());
     },
 
     onMousedown: function (event, ui) {

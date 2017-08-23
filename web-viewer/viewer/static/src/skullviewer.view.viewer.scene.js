@@ -10,20 +10,25 @@ skullviewer.view.viewer.Scene = Backbone.View.extend({
 
     controls: null,
 
+    id: '',
+
     init: function (options) {
         var element = $(this.el),
-            viwer = options.viwer;
-        
+            viewer = options.viewer;
+            id = options.id;
+        console.log('INIT ID', id);
         this.element = element;
-        this.viwer = viwer;
+        this.viewer = viewer;
+        this.id = id;
 
         var height = element.innerHeight();
         var width = element.innerWidth();
+        console.log(height, width);
         var canvasID = element.attr('id');
         var scene = new THREE.Scene(),
             camera = new THREE.PerspectiveCamera( 45.0, width/height, 0.1, 1000 ),
             renderer = new THREE.WebGLRenderer({canvas: document.getElementById(canvasID)}),
-            light = new THREE.PointLight( 0x4d4d4d);
+            light = new THREE.PointLight( 0xa0a0a0);
             // control = new THREE.OrbitControls( camera, renderer.domElement );
         light.position.set(-1000, 0, 0);
         camera.position.set(-400, 0, 0);
@@ -36,18 +41,22 @@ skullviewer.view.viewer.Scene = Backbone.View.extend({
         this.renderer = renderer;
         this.light = light;
 
-        var controls;
-
-        // controls = new THREE.OrbitControls( camera, document.getElementById('result-canvas'));
-        controls = new THREE.OrbitControls( camera, renderer.domElement);
-        controls.addEventListener( 'change', function(){
-            renderer.render(scene, camera);
+        var controls;    
+        var context = this;    
+        camControls = new THREE.OrbitControls( camera, renderer.domElement);
+        lightControls = new THREE.OrbitControls( light, renderer.domElement);
+        camControls.addEventListener( 'change', function(){
+            viewer.sceneSync(context.id, context.camera, context.light);
         }); // remove when using animation loop
 				// enable animation loop when using damping or autorotation
 				//controls.enableDamping = true;
 				//controls.dampingFactor = 0.25;
-		controls.enableZoom = true;
-        this.controls = controls;
+		camControls.enableZoom = true;
+        camControls.enablePan = false;
+        lightControls.enableZoom = false;
+        lightControls.enablePan = false;
+
+        // this.controls = controls;
 
         renderer.setSize( width, height );
         var geometry = new THREE.BoxGeometry( 20, 20, 20 );
@@ -75,6 +84,7 @@ skullviewer.view.viewer.Scene = Backbone.View.extend({
     },
 
     renderSkull: function (name, obj) {
+        console.log(this.id);
         this.scene.remove(this.scene.getObjectByName('temp_cube'));
         this.scene.add(obj);
         this.renderer.render(this.scene, this.camera);
