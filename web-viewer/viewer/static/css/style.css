@@ -11,9 +11,18 @@ h1 {
 	font-size: 20pt;
 }
 
-canvas {
+#query-canvas {
+	position: absolute;
 	outline: 2px solid black;
-	width: 100%;
+	width: 50%;
+	height: 100%;
+}
+
+#result-canvas {
+	position: absolute;
+	outline: 2px solid black;
+	left: 50%;
+	width: 60%;
 	height: 100%;
 }
 

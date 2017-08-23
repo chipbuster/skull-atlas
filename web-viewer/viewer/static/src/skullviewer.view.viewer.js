@@ -1,7 +1,28 @@
 skullviewer.view.Viewer = Backbone.View.extend({
 
+    qscene: new skullviewer.view.viewer.Scene({
+            el: $('#query-canvas')
+    }),
+    
+    rscene: new skullviewer.view.viewer.Scene({
+            el: $('#result-canvas')
+    }),
+
     init: function (options) {
-        //TODO
+        var element = $(this.el),
+            viewer = this,
+            manager = options.manager;
+        
+        this.manager = manager;
+
+        this.qscene.init({
+            viewer: viewer
+        });
+
+        this.rscene.init({
+            viewer: viewer
+        });
+
         return this;
     },
 

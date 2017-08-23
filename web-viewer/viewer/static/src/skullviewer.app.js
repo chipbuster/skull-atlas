@@ -2,9 +2,9 @@ skullviewer.App = Backbone.View.extend({
     
     el: $('body'),
 
-    views:  {
+    views: {
         viewer: new skullviewer.view.Viewer({
-            el: $('#canvas')
+            el: $('#viewer')
         }),
         finder: new skullviewer.view.Finder({
             el: $('#finder')
@@ -14,29 +14,28 @@ skullviewer.App = Backbone.View.extend({
         })
     },
 
-    viewer: new skullviewer.Viewer(),
+    manager: new skullviewer.Manager(),
 
     init: function (option) {
 
         var element = $(this.el),
             views = this.views,
-            viewer = this.viewer;
+            manager = this.manager;
 
-        viewer.init({
-            canvas: $('#canvas'),
+        manager.init({
             console: $('#console')
         });
 
         views.viewer.init({
-            viewer: viewer
+            manager: manager,
         });
 
         views.finder.init({
-            viewer: viewer
+            manager: manager
         });
 
         views.browser.init({
-            viewer: viewer
+            manager: manager
         });
 
         return this;

@@ -1,35 +1,37 @@
-skullviewer.Viewer = Backbone.View.extend({
+skullviewer.Manager = Backbone.View.extend({
 
-    scene: new THREE.Scene(),
+    // scene: new THREE.Scene(),
 
-    camera: new THREE.PerspectiveCamera( 75, window.innerWidth/(window.innerHeight*0.8), 0.1, 1000 ),
+    // camera: new THREE.PerspectiveCamera( 75, window.innerWidth/(window.innerHeight*0.8), 0.1, 1000 ),
 
-    renderer: new THREE.WebGLRenderer(),
+    // renderer: new THREE.WebGLRenderer(),
+
 
     init: function (options) {
+        console.log('SkullView Manager init');
+        
+        // var scene = this.scene,
+        //     camera = this.camera,
+        //     renderer = this.renderer;
+        // renderer.setSize( window.innerWidth, window.innerHeight*0.8 );
+        // document.body.replaceChild( renderer.domElement , document.getElementById("viewer"));
 
-        var scene = this.scene,
-            camera = this.camera,
-            renderer = this.renderer;
-        renderer.setSize( window.innerWidth, window.innerHeight*0.8 );
-        document.body.replaceChild( renderer.domElement , document.getElementById("viewer"));
+        // var geometry = new THREE.BoxGeometry( 2, 2, 2 );
+        // var material = new THREE.MeshBasicMaterial( { color: 0x2c2c2c , wireframe: true} );
+        // var cube = new THREE.Mesh( geometry, material );
+        // cube.name = "temp_cube";
+        // scene.add( cube );
+        // scene.background = new THREE.Color( 0xfcfcfc );
 
-        var geometry = new THREE.BoxGeometry( 2, 2, 2 );
-        var material = new THREE.MeshBasicMaterial( { color: 0x2c2c2c , wireframe: true} );
-        var cube = new THREE.Mesh( geometry, material );
-        cube.name = "temp_cube";
-        scene.add( cube );
-        scene.background = new THREE.Color( 0xfcfcfc );
+        // camera.position.z = 5;
 
-        camera.position.z = 5;
-
-        var animate = function () {
-            requestAnimationFrame( animate );
-            cube.rotation.x += 0.01;
-            cube.rotation.y += 0.01;
-            renderer.render(scene, camera);
-        };
-        animate();
+        // var animate = function () {
+        //     requestAnimationFrame( animate );
+        //     cube.rotation.x += 0.01;
+        //     cube.rotation.y += 0.01;
+        //     renderer.render(scene, camera);
+        // };
+        // animate();
     },
 
     loadFile: function (objFile) {

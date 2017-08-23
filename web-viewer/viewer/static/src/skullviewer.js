@@ -9,7 +9,9 @@ var skullviewer = (function () {
 
         model: {},
 
-        view: {},
+        view: {
+            viewer: {}
+        },
 
         parser: {},
 
