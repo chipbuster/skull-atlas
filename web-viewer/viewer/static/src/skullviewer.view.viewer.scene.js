@@ -28,8 +28,11 @@ skullviewer.view.viewer.Scene = Backbone.View.extend({
         var scene = new THREE.Scene(),
             camera = new THREE.PerspectiveCamera( 45.0, width/height, 0.1, 1000 ),
             renderer = new THREE.WebGLRenderer({canvas: document.getElementById(canvasID)}),
-            light = new THREE.PointLight( 0xa0a0a0);
+            light = new THREE.DirectionalLight( 0x808080, 1.0);
+
             // control = new THREE.OrbitControls( camera, renderer.domElement );
+        var light1 = new THREE.AmbientLight(0x808080);
+        scene.add(light1);
         light.position.set(-1000, 0, 0);
         camera.position.set(-400, 0, 0);
         camera.up = new THREE.Vector3(0,0,1);
