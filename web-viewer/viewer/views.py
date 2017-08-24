@@ -16,6 +16,25 @@ def index(request):
     context = {}
     return HttpResponse(template.render(context, request))
 
+def wall(request):
+    template = loader.get_template('viewer/wall.html')
+    context = {}
+    return HttpResponse(template.render(context, request))
+
+def skulls(request):
+    id = request.GET['skull']
+    dec = int(request.GET['dec'])
+    skull = Skull.objects.get(identity=id)
+    # print('HAHA', id, dec, skull.obj_path_decimated)
+    filename = skull.obj_path
+    if dec == 1:
+        filename = filename.replace('models', 'decimated')
+    
+    print(filename)
+    with open(filename, 'r') as f:
+        obj = f.read()
+        return HttpResponse(obj)
+
 
 def show_skulls(request):
     skull_each_page = 8

@@ -77,6 +77,7 @@ def load_skull():
 			skull = Skull.objects.get(identity=model_id)
 			skull.name = name
 			skull.save()
+			print("decimated: ", model_id)
 		except:
 			print("name map fails: ", model_id)
 
