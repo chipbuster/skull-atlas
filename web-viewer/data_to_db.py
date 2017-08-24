@@ -35,7 +35,7 @@ def load_similarity():
 
 	f.close()
 
-	print "similarity records: ", len(SimilarityScore.objects.all())
+	print("similarity records: ", len(SimilarityScore.objects.all()))
 
 def load_skull():
 	for model in os.listdir(models_path):
