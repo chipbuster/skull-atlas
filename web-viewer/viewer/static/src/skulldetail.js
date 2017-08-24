@@ -106,13 +106,16 @@ $(document).ready(function () {
                 }
             },
 
-            requestSkull: function (url) {
+            requestSkull: function (url, type) {
                 var context = this;
                 this.onLoad();
 
                 $.get(url, function (data) {
-                    context.parseSkull(data);
+                    context.parseSkull(data['obj']);
                     context.loadDone();
+                    if(type == 1){
+                        $('#skull-name').html('&nbsp Skull Atlas:&nbsp ' + data['name'])
+                    }
                 });
             },
 
@@ -299,12 +302,12 @@ $(document).ready(function () {
             },
 
             loadModels: function () {
-                this.mainScene.requestSkull(this.getURL(this.id, 0));
+                this.mainScene.requestSkull(this.getURL(this.id, 0), 1);
                 if (this.type ==='healthy') {
                     return;
                 }
                 for (var i = 0; i < this.results.length; ++i) {
-                    this.sideScenes[i].requestSkull(this.getURL(this.results[i], 1));
+                    this.sideScenes[i].requestSkull(this.getURL(this.results[i], 1), 0);
                 }
             }
         };

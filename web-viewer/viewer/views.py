@@ -59,7 +59,7 @@ def skulls(request):
     
     with open(filename, 'r') as f:
         obj = f.read()
-        return HttpResponse(obj)
+        return JsonResponse({'obj':obj, 'name':skull.name})
 
 def frames(request):
     query_id = request.GET['query']

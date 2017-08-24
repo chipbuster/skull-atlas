@@ -96,8 +96,11 @@ $(document).ready(function () {
                 var context = this;
                 this.onLoad()
                 $.get(url, function (data) {
-                    context.parseSkull(data);
-                    context.loadDone()
+                    context.parseSkull(data['obj']);
+                    context.loadDone();
+                    console.log(data['name'])
+                    $('#'+context.id+'-name').text(data['name'])
+                    $('#'+context.id+'-name')[0].style['textAlign']='center'
                 });
             },
 
@@ -189,6 +192,8 @@ $(document).ready(function () {
                     height = this.wall.height(),
                     width = this.wall.width();
                 var gridH = height / row;
+                var textH = 30;
+                var canvH = gridH - textH;
                 var gridW = width / col;
                 for (var i = 0; i < row; ++i) {
                     for (var j = 0; j < col; ++j) {
@@ -198,8 +203,12 @@ $(document).ready(function () {
                         var node_load = this.createLoader(id);
                         this.wall.append(node_load);
 
-                        node_load.css({ top: i * gridH, left: j * gridW, height: gridH, width: gridW });
-                        node.css({ top: i * gridH, left: j * gridW, height: gridH, width: gridW });
+                        node_load.css({ top: i * gridH, left: j * gridW, height: canvH, width: gridW });
+                        node.css({ top: i * gridH, left: j * gridW, height: canvH, width: gridW });
+
+                        var text_div = $('<div id="'+id+'-name" style="position:absolute;"></div>')
+                        this.wall.append(text_div)
+                        text_div.css({ top: (i+1) * gridH - textH, left: j * gridW, height: textH, width: gridW })
 
                         var scene  =  SkullGrid();
                         scene.init({

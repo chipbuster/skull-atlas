@@ -138,7 +138,7 @@ skullviewer.Manager = Backbone.View.extend({
             //     context.loadDone('result');
             // })
             console.log('UP', per, 'MAX', context.maxFrame);
-            var nextFrame = Math.floor(per * context.maxFrame / 100);
+            var nextFrame = Math.round(per * context.maxFrame / 100);
             var progress = $('.progress');
             var position = nextFrame * progress.width() / context.maxFrame;
             position += progress.offset().left;
@@ -211,12 +211,14 @@ skullviewer.Manager = Backbone.View.extend({
         context.loadStart('result');
 
         $.get(this.skullsURL(this.query, 0), function (data) {
-            context.loadObjToScene('query', data);
+            context.loadObjToScene('query', data['obj']);
             context.loadDone('query');
+            $('#skull_left').html("&nbsp Left: " + data['name'])
         });
         $.get(this.skullsURL(this.result, 0), function (data) {
-            context.loadObjToScene('result', data);
+            context.loadObjToScene('result', data['obj']);
             context.loadDone('result');
+            $('#skull_right').html("&nbsp Right: " + data['name'])
         });
     },
 
@@ -279,7 +281,7 @@ skullviewer.Manager = Backbone.View.extend({
         }
         $('.timeBar').css('width', percentage + '%');
 
-        var frame = Math.floor(percentage * this.maxFrame / 100);
+        var frame = Math.round(percentage * this.maxFrame / 100);
         $('#frame_num').html('&nbsp Frame: '+frame+'/'+this.maxFrame);
         return percentage
     },
