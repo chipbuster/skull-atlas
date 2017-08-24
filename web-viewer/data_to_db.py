@@ -55,13 +55,14 @@ def load_skull():
 		print("model loaded: ", model_id)
 
 	for dec in os.listdir(decimated_path):
-		if len(dec) < 5 or dec[-4:] != '.obj':
+		if len(dec) < 4 or dec[-4:] != '.obj':
 			continue
-		model_id = model[:-4]
+		model_id = dec[:-4]
 		try:
 			skull = Skull.objects.get(identity=model_id)
 			skull.obj_decimated = decimated_path + dec
 			skull.save()
+			print("decimated: ", dec)
 		except:
 			print("decimated fails: ", model_id)
 
@@ -80,16 +81,24 @@ def load_skull():
 			print("name map fails: ", model_id)
 
 def load_deformation():
-	for deform in os.listdir(deformation_path):
-		if len(deform) < 5 or deform[-4:] != '.obj':
+	for d in os.listdir(deformation_path):
+		if len(d) < 5 or d[-4:] != '.obj':
 			continue
-		file_name = deform[:-4]
+		file_name = d[:-4]
 		parts = file_name.split('_')
 		skull1_identity = parts[0]
 		skull2_identity = parts[1]
 		frame = int(parts[2])
 		if len(parts) > 3 and parts[3] == 'dec':
-			deform = Deformation.objects.get_or_create(skull1_identity = skull1_identity, skull2_identity=skull2_identity, frame_num = frame, obj_decimated = deformation_path + deform)
+			deform = Deformation.objects.get_or_create(skull1_identity = skull1_identity, skull2_identity=skull2_identity, frame_num = frame)[0]
+			deform.obj_decimated = deformation_path + d
+			deform.save()
+			print("deform: ", d)
+		else:
+			deform = Deformation.objects.get_or_create(skull1_identity = skull1_identity, skull2_identity=skull2_identity, frame_num = frame)[0]
+			deform.obj_path = deformation_path + d
+			deform.save()
+			print("deform: ", d)
 
 
 def clear_data():

@@ -1,4 +1,5 @@
 #loader {
+    background-color: white;
     bottom: 0;
     height: 175px;
     left: 0;
@@ -9,6 +10,7 @@
     width: 175px;
 }
 #loader {
+    background-color: white;
     bottom: 0;
     height: 175px;
     left: 0;
@@ -96,7 +98,7 @@
     background: #000000 none repeat scroll 0 0;
 }
 #loader .lading {
-    background-image: url("../images/loading.gif");
+    background-color: white;
     background-position: 50% 50%;
     background-repeat: no-repeat;
     bottom: -40px;

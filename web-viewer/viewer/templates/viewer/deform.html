@@ -4,11 +4,13 @@
     <meta charset="UTF-8" />
 
     <title>Skull Atlas</title>
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
     <link rel="stylesheet" href="static/css/reset.css" />
     <link rel="stylesheet" href="static/css/ui-lightness/jquery-ui-1.8.13.custom.css" />
     <link rel="stylesheet" href="static/css/style.css" />
     <link rel="stylesheet" href="static/css/loader.css" />
+    <link rel="stylesheet" href="static/css/control.css" />
     <script type="text/javascript">
         function hide (elements) {
           elements = elements.length ? elements : [elements];
@@ -22,7 +24,6 @@
             elements[index].style.visibility = 'visible';
           }
         }
-      
     </script>
 </head>
 
@@ -30,14 +31,33 @@
     <div id="header" class="ui-layout-north">
         <h1> &nbsp Skull Atlas</h1>
         <form id="finder">
-            <input type="file" id="select-file" name="select-file" enctype="multipart/form-data" />
             <button type="button" id="load-btn">Load!</button>
             <button type="button" id="deform-btn">Deform!</button>
         </form>
+
+        <div class="videoContainer">
+            <video id="myVideo"  height="50" >
+            </video>
+            <div class="control">
+                <div class="btmControl">
+                    <div class="btnPlay btn" title="Play/Pause video"><span class="icon-play"></span></div>
+                    <div class="progress-bar">
+                        <div class="progress">
+                            <span class="bufferBar"></span>
+                            <span class="timeBar"></span>
+                        </div>
+                    </div>
+
+                    <div id="c-left" class="sound"><i class="fa fa-camera-retro"></i></div>
+                    <div id="c-right" class="btnFS btn"><i class="fa fa-camera-retro"></i></div>
+                </div>   
+            </div>
+        </div>
+
     </div>
 
     <div id="viewer" class="ui-layout-center">
-        <div id="result-load" class="load", style="display: none;">
+        <div id="result-load" class="load", style="display: none; background-color: white;">
             <div id="loader">
                 <div class="dot"></div>
                 <div class="dot"></div>
@@ -50,7 +70,7 @@
                 <div class="lading"></div>
             </div>
         </div>
-        <div id="query-load" class="load", style="display: none;">
+        <div id="query-load" class="load", style="display: none; background-color: white;">
             <div id="loader">
                 <div class="dot"></div>
                 <div class="dot"></div>
