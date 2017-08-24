@@ -3,6 +3,8 @@ $(document).ready(function () {
         return {
             cube: null,
 
+            obj: null,
+            
             init: function (options) {
                 var element =options.element,
                     wall = options.wall,
@@ -38,10 +40,11 @@ $(document).ready(function () {
                 var geometry = new THREE.BoxGeometry(20, 20, 20);
                 var material = new THREE.MeshBasicMaterial({ color: 0x2c2c2c, wireframe: true });
                 var cube = new THREE.Mesh(geometry, material);
-                cube.name = id;
+                cube.name = this.id;
                 this.cube = cube;
 
                 scene.add(cube);
+                this.obj = cube;
                 scene.add(directionalLight);
                 scene.add(ambientLight);
 
@@ -58,12 +61,14 @@ $(document).ready(function () {
                 obj.name = this.id;
                 this.scene.remove(this.scene.getObjectByName(this.id));
                 this.scene.add(obj);
+                this.obj = obj;
                 this.renderer.render(this.scene, this.camera);
             },
 
             renderCube: function () {
                 this.scene.remove(this.scene.getObjectByName(this.id));
                 this.scene.add(this.cube);
+                this.obj = this.cube;
                 this.renderer.render(this.scene, this.camera);
             },
 
@@ -73,7 +78,6 @@ $(document).ready(function () {
                 var object = (loader.parse(data)).children[0];
                 if (object instanceof THREE.Mesh) {
                     object.material = OBJMaterial;
-                    // object.name = id;
                     this.renderSkull(object);
                 }
             },
@@ -83,6 +87,11 @@ $(document).ready(function () {
                 $.get(url, function (data) {
                     context.parseSkull(data);
                 });
+            },
+
+            updataRotate: function (grotate) {
+                this.obj.rotation.z = grotate;
+                this.renderer.render(this.scene, this.camera);
             }
         }
     };
@@ -103,6 +112,8 @@ $(document).ready(function () {
             col: 4,
 
             page: 0,
+
+            globalRotation: 0,
 
             grids: [],
 
@@ -133,9 +144,18 @@ $(document).ready(function () {
                     context.onNextClicked();
                 });
 
+                setInterval( function(){ 
+                    context.onTimeOut();
+                }, 100);            
                 this.onHealthyClicked();
             },
 
+            onTimeOut() {
+                this.globalRotation += 0.1;
+                for (var i = 0; i < this.row * this.col; ++i) {
+                    this.scenes[i].updataRotate(this.globalRotation);
+                }
+            },
             initCanvas: function () {
                 var row = this.row,
                     col = this.col,
