@@ -82,10 +82,22 @@ $(document).ready(function () {
                 }
             },
 
+            onLoad: function(){
+                document.getElementById(this.id + "-load").style.display = "block";
+                document.getElementById(this.id + "-canvas").style.display = "none";
+            },
+
+            loadDone: function(){
+                document.getElementById(this.id + "-load").style.display = "none";
+                document.getElementById(this.id + "-canvas").style.display = "block";
+            },
+
             requestSkull: function (url) {
                 var context = this;
+                this.onLoad()
                 $.get(url, function (data) {
                     context.parseSkull(data);
+                    context.loadDone()
                 });
             },
 
@@ -181,8 +193,12 @@ $(document).ready(function () {
                 for (var i = 0; i < row; ++i) {
                     for (var j = 0; j < col; ++j) {
                         var id = '' + (i * col + j);
-                        var node = $('<canvas id="node' + id + '"/>');
+                        var node = $('<canvas id="'+ id + '-canvas"/>');
                         this.wall.append(node);
+                        var node_load = this.createLoader(id);
+                        this.wall.append(node_load);
+
+                        node_load.css({ top: i * gridH, left: j * gridW, height: gridH, width: gridW });
                         node.css({ top: i * gridH, left: j * gridW, height: gridH, width: gridW });
 
                         var scene  =  SkullGrid();
@@ -195,6 +211,18 @@ $(document).ready(function () {
                         this.scenes.push(scene);
                     }
                 }
+            },
+
+            createLoader: function(id) {
+                var div = $('<div id="'+id+'-load" class="load" style="background-color: white;"></div>')
+                var loader = $('<div id="loader"></div>')
+                for (var i = 0; i < 8; i++){
+                    var dot = $('<div class="dot"></div>')
+                    loader.append(dot)
+                }
+                loader.append('<div class="lading"></div>')
+                div.append(loader)
+                return div
             },
 
             onSceneClicked (id) {

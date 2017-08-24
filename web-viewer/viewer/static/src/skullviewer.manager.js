@@ -72,17 +72,17 @@ skullviewer.Manager = Backbone.View.extend({
         if (context.currentFrame > 1) {
             context.loadStart('result');
             var lastFrame = this.currentFrame - 1;
+
+            var progress = $('.progress');
+            var position = lastFrame * progress.width() / context.maxFrame;
+            position += progress.offset().left;
+            context.updatebar(position);
+
             context.lock = true;
             $.get(this.framesURL(lastFrame, 0), function (data) {
                 context.loadObjToScene('result', data);
                 context.loadDone('result');
                 context.currentFrame -= 1;
-
-                var progress = $('.progress');
-                var position = context.currentFrame * progress.width() / context.maxFrame;
-                position += progress.offset().left;
-                context.updatebar(position);
-
                 context.lock = false;
 
             });
@@ -97,16 +97,17 @@ skullviewer.Manager = Backbone.View.extend({
         if (context.currentFrame < context.maxFrame) {
             context.loadStart('result');
             var nextFrame = this.currentFrame + 1;
+
+            var progress = $('.progress');
+            var position = nextFrame * progress.width() / context.maxFrame;
+            position += progress.offset().left;
+            context.updatebar(position);
+
             context.lock = true;
             $.get(this.framesURL(nextFrame, 0), function (data) {
                 context.loadObjToScene('result', data);
                 context.loadDone('result');
                 context.currentFrame += 1;
-
-                var progress = $('.progress');
-                var position = context.currentFrame * progress.width() / context.maxFrame;
-                position += progress.offset().left;
-                context.updatebar(position);
 
                 context.lock = false;
             })
@@ -131,12 +132,18 @@ skullviewer.Manager = Backbone.View.extend({
             context.timeDrag = false;
             context.loadStart('result');
             var per = context.updatebar(e.pageX);
+
             // $.get('deform/?skull1=' + context.skull1_id + '&skull2=' + context.skull2_id + '&frame=' + context.currentFrame + '&dec=0', function (data) {
             //     context.loadObjToScene('result', data['obj']);
             //     context.loadDone('result');
             // })
             console.log('UP', per, 'MAX', context.maxFrame);
             var nextFrame = Math.floor(per * context.maxFrame / 100);
+            var progress = $('.progress');
+            var position = nextFrame * progress.width() / context.maxFrame;
+            position += progress.offset().left;
+            context.updatebar(position);
+
             console.log('Next', nextFrame);
             context.lock = true;
             $.get(this.framesURL(nextFrame, 0), function (data) {
@@ -271,6 +278,9 @@ skullviewer.Manager = Backbone.View.extend({
             percentage = 0;
         }
         $('.timeBar').css('width', percentage + '%');
+
+        var frame = Math.floor(percentage * this.maxFrame / 100);
+        $('#frame_num').html('&nbsp Frame: '+frame+'/'+this.maxFrame);
         return percentage
     },
 

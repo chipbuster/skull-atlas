@@ -71,6 +71,16 @@ $(document).ready(function () {
                 this.renderer.render(this.scene, this.camera);
             },
 
+            onLoad: function(){
+                document.getElementById(this.id + "-load").style.display = "block";
+                document.getElementById(this.id + "-canvas").style.display = "none";
+            },
+
+            loadDone: function(){
+                document.getElementById(this.id + "-load").style.display = "none";
+                document.getElementById(this.id + "-canvas").style.display = "block";
+            },
+
             renderSkull: function (obj) {
                 obj.name = this.id;
                 this.scene.remove(this.scene.getObjectByName(this.id));
@@ -98,8 +108,11 @@ $(document).ready(function () {
 
             requestSkull: function (url) {
                 var context = this;
+                this.onLoad();
+
                 $.get(url, function (data) {
                     context.parseSkull(data);
+                    context.loadDone();
                 });
             },
 
@@ -180,9 +193,14 @@ $(document).ready(function () {
             initMainView: function () {
                 console.log('Main Init');
                 var id = 'main';
-                var node = $('<canvas id="node' + id + '"/>');
+                var node = $('<canvas id="' + id + '-canvas"/>');
                 this.leftViewer.append(node);
                 node.css({ width: '100%', height: '100%' });
+
+                var node_load = this.createLoader(id);
+                this.leftViewer.append(node_load, 0);
+                node_load.css({ width: '100%', height: '100%' });
+
                 var scene = SkullGrid();
                 scene.init({
                     element: node,
@@ -192,6 +210,23 @@ $(document).ready(function () {
 
                 this.mainGrid = node;
                 this.mainScene = scene;
+            },
+
+            createLoader: function(id, type) {
+                var div = $('<div id="'+id+'-load" class="load" style="display:none; background-color: white;"></div>')
+                if (type == 1){
+                    var loader = $('<div id="loader" style="height:100px; width:100px;"></div>')
+                }
+                else{
+                    var loader = $('<div id="loader"></div>')
+                }
+                for (var i = 0; i < 8; i++){
+                    var dot = $('<div class="dot"></div>')
+                    loader.append(dot)
+                }
+                loader.append('<div class="lading"></div>')
+                div.append(loader)
+                return div
             },
 
             bindScenesClicked: function () {
@@ -238,9 +273,14 @@ $(document).ready(function () {
                 for (var i = 0; i < row; ++i) {
                     for (var j = 0; j < col; ++j) {
                         var id = '' + (i * col + j);
-                        var node = $('<canvas id="node' + id + '"/>');
+                        var node = $('<canvas id="' + id + '-canvas"/>');
                         this.rightViewer.append(node);
                         node.css({ top: i * gridH, left: j * gridW, height: gridH, width: gridW });
+
+                        var node_load = this.createLoader(id, 0);
+                        this.rightViewer.append(node_load);
+                        node_load.css({ top: i * gridH, left: j * gridW, height: gridH, width: gridW });
+
                         var scene = SkullGrid();
                         scene.init({
                             element: node,

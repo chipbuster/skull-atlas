@@ -9,17 +9,7 @@
     top: 0;
     width: 175px;
 }
-#loader {
-    background-color: white;
-    bottom: 0;
-    height: 175px;
-    left: 0;
-    margin: auto;
-    position: absolute;
-    right: 0;
-    top: 0;
-    width: 175px;
-}
+
 #loader .dot {
     bottom: 0;
     height: 100%;
@@ -28,7 +18,7 @@
     position: absolute;
     right: 0;
     top: 0;
-    width: 87.5px;
+    width: 10%;
 }
 #loader .dot::before {
     border-radius: 100%;
@@ -39,7 +29,7 @@
     right: 0;
     top: 0;
     transform: scale(0);
-    width: 87.5px;
+    width: 10%;
 }
 #loader .dot:nth-child(7n+1) {
     transform: rotate(45deg);

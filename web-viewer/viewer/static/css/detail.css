@@ -14,8 +14,17 @@
     position: absolute;
 }
 
+#right-vierwer #loader {
+	max-height: 100px;
+	max-width: 100px;
+}
+
 #detail-viewer canvas {
 	position: absolute;
 	outline: 1px solid black;
+}
+
+.load {
+    position: absolute; 
 }
 
