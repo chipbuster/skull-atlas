@@ -207,8 +207,8 @@ $(document).ready(function () {
                 var idInt = parseInt(id);
                 var qmodel = this.id;
                 var rmodel = this.results[idInt];
-                // window.location.replace('/deform?skull=' + modelName);
-                console.log(qmodel, rmodel);
+                window.location.replace('/deform?skull1=' + rmodel + '&skull2=' + qmodel);
+                // console.log(qmodel, rmodel);
             },
 
             onMainChange: function () {

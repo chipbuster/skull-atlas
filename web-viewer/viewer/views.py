@@ -12,9 +12,16 @@ import math
 import json
 
 
-def index(request):
-    template = loader.get_template('viewer/index.html')
-    context = {}
+def deform(request):
+    template = loader.get_template('viewer/deform.html')
+
+    #skull2 query, skull1 result
+    result_identity = request.GET.get('skull1', '-1')
+    query_identity = request.GET.get('skull2', '-1')
+
+    max_frame = len(Deformation.objects.filter(skull1_identity=result_identity, skull2_identity=query_identity))
+    data = {'query': query_identity, 'result': result_identity, 'max_frame': max_frame}
+    context = {'data': json.dumps(data)}
     return HttpResponse(template.render(context, request))
 
 def wall(request):

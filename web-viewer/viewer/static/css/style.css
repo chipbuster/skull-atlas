@@ -4,11 +4,16 @@ body {
 
 header {
 	padding: 10px;
+	/*display: none;*/
 }
 
 h1 {
 	display: inline;
 	font-size: 20pt;
+}
+
+#data-div {
+    display: none;
 }
 
 #query-canvas {
@@ -48,6 +53,7 @@ h1 {
 
 #finder {
 	margin: 0 auto 0px;
+	display: none;
 }
 
 #header {
