@@ -92,6 +92,13 @@ $(document).ready(function () {
             updataRotate: function (grotate) {
                 this.obj.rotation.z = grotate;
                 this.renderer.render(this.scene, this.camera);
+            },
+
+            bindClicked: function () {
+                var context = this;
+                this.element.click(function () {
+                    context.wall.onSceneClicked(context.id);
+                });
             }
         }
     };
@@ -148,6 +155,13 @@ $(document).ready(function () {
                     context.onTimeOut();
                 }, 100);            
                 this.onHealthyClicked();
+                this.bindScenesClicked();
+            },
+
+            bindScenesClicked: function () {
+                for (var i = 0; i < this.row * this.col; ++i) {
+                    this.scenes[i].bindClicked();
+                }
             },
 
             onTimeOut() {
@@ -156,6 +170,7 @@ $(document).ready(function () {
                     this.scenes[i].updataRotate(this.globalRotation);
                 }
             },
+        
             initCanvas: function () {
                 var row = this.row,
                     col = this.col,
@@ -180,6 +195,19 @@ $(document).ready(function () {
                         this.scenes.push(scene);
                     }
                 }
+            },
+
+            onSceneClicked (id) {
+                var idInt = parseInt(id);
+                idInt = (this.page - 1) * this.row * this.col + idInt + 1;
+                var maxID = this.tab==='healthy' ? 93: 3;
+                if (idInt > maxID) {
+                    alert('Please select a model!');
+                    return;
+                }
+                var modelName = this.tab === 'healthy' ? 'p' : 'q';
+                modelName = modelName + idInt;
+                window.location.replace('/detail?skull=' + modelName);
             },
 
             onHealthyClicked() {
@@ -230,12 +258,10 @@ $(document).ready(function () {
                 
                 var minPage = 1;
                 var maxPage = Math.ceil(maxID / num);
-                console.log(this.tab, minPage, maxPage);
 
                 newPage = Math.max(newPage, minPage);
                 newPage = Math.min(newPage, maxPage);
                 if (newPage === this.page && (!changed)) {
-                    console.log('Cant Page');
                     return;
                 }
 

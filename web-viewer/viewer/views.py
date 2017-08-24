@@ -77,7 +77,8 @@ def show_skulls(request):
             'status': 0
         }
     return JsonResponse(context)
-
+def detail(request):
+    return HttpResponse('DETAIL')
 
 def skull_detail(request):
     template = loader.get_template('viewer/index.html')
