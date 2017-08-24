@@ -83,6 +83,7 @@ $(document).ready(function () {
             },
 
             onLoad: function(){
+                $('#'+this.id+'-name').text('')
                 document.getElementById(this.id + "-load").style.display = "block";
                 document.getElementById(this.id + "-canvas").style.display = "none";
             },
