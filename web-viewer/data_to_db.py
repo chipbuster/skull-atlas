@@ -13,7 +13,9 @@ from viewer.models import Skull, Deformation, SimilarityScore
 models_path = './data/models/'
 deformation_path = './data/deformation/'
 thumbnails_path = './data/thumbnails/'
+decimated_path = './data/decimated/'
 similarity_path = './data/similarity.txt'
+map_path = './data/map.txt'
  
 def load_similarity():
 	f = open(similarity_path, 'r')
@@ -49,30 +51,46 @@ def load_skull():
 			skull_type = 'healthy'
 			print("no such type in load_skull")
 		skull = Skull.objects.get_or_create(identity=model_id, skull_type = skull_type,
-			obj_decimated=models_path + model)
+			obj_path=models_path + model)
+		print("model loaded: ", model_id)
 
-	for thumbnail in os.listdir(thumbnails_path):
-		if len(thumbnail) < 5 or thumbnail[-4:] != 'png':
+	for dec in os.listdir(decimated_path):
+		if len(dec) < 5 or dec[-4:] != '.obj':
 			continue
-
-		thumbnail_name = thumbnail[:-4]
+		model_id = model[:-4]
 		try:
-			skull = Skull.objects.get(identity=thumbnail_name)
-			skull.thumbnail = Image.open(thumbnails_path + thumbnail)
-			
+			skull = Skull.objects.get(identity=model_id)
+			skull.obj_decimated = decimated_path + dec
+			skull.save()
 		except:
-			print("thumbnail match fails in load_skull")
+			print("decimated fails: ", model_id)
 
+	f = open(map_path, 'r')
+	strs = f.read()
+	f.close()
+	for line in strs.split('\n'):
+		ls = line.split(' ')
+		model_id = ls[1][:-4]
+		name = ls[0][:-4]
+		try:
+			skull = Skull.objects.get(identity=model_id)
+			skull.name = name
+			skull.save()
+		except:
+			print("name map fails: ", model_id)
 
 def load_deformation():
 	for deform in os.listdir(deformation_path):
 		if len(deform) < 5 or deform[-4:] != '.obj':
 			continue
 		file_name = deform[:-4]
-		skull1_identity = 'result'
-		skull2_identity = 'query'
-		frame = int(file_name)
-		deform = Deformation.objects.get_or_create(skull1_identity = skull1_identity, skull2_identity=skull2_identity, frame_num = frame, obj_decimated = deformation_path + deform)
+		parts = file_name.split('_')
+		skull1_identity = parts[0]
+		skull2_identity = parts[1]
+		frame = int(parts[2])
+		if len(parts) > 3 and parts[3] == 'dec':
+			deform = Deformation.objects.get_or_create(skull1_identity = skull1_identity, skull2_identity=skull2_identity, frame_num = frame, obj_decimated = deformation_path + deform)
+
 
 def clear_data():
 	Skull.objects.all().delete()
