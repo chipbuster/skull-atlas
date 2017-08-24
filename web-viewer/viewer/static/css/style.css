@@ -25,6 +25,20 @@ h1 {
 	width: 50%;
 	height: 100%;
 }
+#query-load {
+	position: absolute;
+	outline: 2px solid black;
+	width: 50%;
+	height: 100%;
+}
+
+#result-load {
+	position: absolute;
+	outline: 2px solid black;
+	left: 50%;
+	width: 50%;
+	height: 100%;
+}
 
 .mesh-label {
 	display: inline;

@@ -18,10 +18,10 @@ def index(request):
 def show_skulls(request):
 	skull_each_page = 8
 	if request.method == 'GET':
-		page = int(request.GET.get('page','-1'))
+		page = int(request.GET.get('page','1'))
 		skull_type = request.GET.get('type', 'healthy')
 
-		skulls = Skull.objects.all() 
+		skulls = Skull.objects.filter(skull_type=skull_type)
 		total_skull_num = len(skulls)
 
 		start_idx = (page - 1) * skull_each_page
@@ -38,8 +38,6 @@ def show_skulls(request):
 			res = {
 				'name':s.name,
 				'identity':s.identity,
-				'obj_path':s.obj_path,
-				'vertices':s.vertices,
 			}
 			dec_f = open(s.obj_path_decimated,'r')
 			res['obj_decimated'] = dec_f.read()
@@ -81,7 +79,7 @@ def skull_detail(request):
 					'identity': skull2.identity,
 					'name':skull2.name,
 					'type': skull2.skull_type,
-					'thumbnail':skull2.thumbnail,
+					'obj_decimated':skull2.obj_decimated,
 				})
 
 		context = {
@@ -163,10 +161,8 @@ def similar_skull(request):
 
 		skull1 = Skull.objects.get(identity=skull1_identity)
 		skull2 = Skull.objects.get(identity=skull2_identity)
-		# skull1_vertices = decode_float_list(skull1.vertices)
-		# skull2_vertices = decode_float_list(skull2.vertices)
-		skull1_obj = open(skull1.obj_decimated, 'r')
-		skull2_obj = open(skull2.obj_decimated, 'r')
+		skull1_obj = open(skull1.obj_path, 'r')
+		skull2_obj = open(skull2.obj_path, 'r')
 
 		context = {
 			'status':1,

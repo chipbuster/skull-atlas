@@ -8,10 +8,25 @@
     <link rel="stylesheet" href="static/css/reset.css" />
     <link rel="stylesheet" href="static/css/ui-lightness/jquery-ui-1.8.13.custom.css" />
     <link rel="stylesheet" href="static/css/style.css" />
+    <link rel="stylesheet" href="static/css/loader.css" />
+    <script type="text/javascript">
+        function hide (elements) {
+          elements = elements.length ? elements : [elements];
+          for (var index = 0; index < elements.length; index++) {
+            elements[index].style.visibility = 'hidden';
+          }
+        }
+        function show (elements) {
+          elements = elements.length ? elements : [elements];
+          for (var index = 0; index < elements.length; index++) {
+            elements[index].style.visibility = 'visible';
+          }
+        }
+      
+    </script>
 </head>
 
 <body>
-
     <div id="header" class="ui-layout-north">
         <h1> &nbsp Skull Atlas</h1>
         <form id="finder">
@@ -22,16 +37,35 @@
     </div>
 
     <div id="viewer" class="ui-layout-center">
+        <div id="result-load" class="load", style="display: none;">
+            <div id="loader">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="lading"></div>
+            </div>
+        </div>
+        <div id="query-load" class="load", style="display: none;">
+            <div id="loader">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="lading"></div>
+            </div>
+        </div>
         <canvas id="result-canvas"></canvas>
         <canvas id="query-canvas"></canvas>
     </div>
-    
-    <div id="console" class="ui-layout-south">
-        <div id="browser">
-            &nbsp &nbsp Skull Model:
-        </div>
-    </div>
-
 
     <!-- LIBS -->
     <script src="static/lib/jquery-3.2.1.min.js"></script>

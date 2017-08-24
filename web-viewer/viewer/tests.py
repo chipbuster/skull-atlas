@@ -51,4 +51,11 @@ def test_similarity():
 	s1_name = 'female_caucasian_6-1_7607653_1.obj'
 	print len([ss.skull1_identity + ' ' + str(ss.score) for ss in SimilarityScore.objects.filter(skull1_identity=s1_name)])
 
-test_model()
+pyth = './data/map.txt'
+f = open(pyth, 'r')
+strs = f.read()
+for line in strs.split('\n'):
+	ls = line.split(' ')
+	name = ls[0]
+	ide = ls[1]
+	print ide + ' ' + name
