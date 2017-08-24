@@ -198,7 +198,7 @@ $(document).ready(function () {
                 if (this.type ==='healthy') {
                     return;
                 }
-                for (var i = 0; i < this.sideScenes.length; ++i) {
+                for (var i = 0; i < 2; ++i) {
                     this.sideScenes[i].bindClicked();
                 }
             },

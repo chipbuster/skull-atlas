@@ -87,7 +87,6 @@ skullviewer.view.viewer.Scene = Backbone.View.extend({
     },
 
     renderSkull: function (name, obj) {
-        console.log(this.id);
         this.scene.remove(this.scene.getObjectByName(this.id));
         this.scene.add(obj);
         this.renderer.render(this.scene, this.camera);

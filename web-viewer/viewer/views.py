@@ -51,12 +51,28 @@ def detail(request):
 
 def skulls(request):
     id = request.GET['skull']
-    dec = int(request.GET['dec'])
+    dec = int(request.GET['dec'], 0)
     skull = Skull.objects.get(identity=id)
-    # print('HAHA', id, dec, skull.obj_path_decimated)
     filename = skull.obj_path
     if dec == 1:
         filename = skull.obj_decimated
+    
+    with open(filename, 'r') as f:
+        obj = f.read()
+        return HttpResponse(obj)
+
+def frames(request):
+    query_id = request.GET['query']
+    result_id = request.GET['result']
+    frame = int(request.GET['frame'])
+    dec = int(request.GET['dec'])
+
+    deform = Deformation.objects.get(
+        skull1_identity=result_id, skull2_identity=query_id, frame_num=frame)
+    filename = deform.obj_path
+    print('DEFORM PATH', deform.obj_path, deform.obj_decimated)
+    if dec == 1:
+        filename = deform.obj_decimated
     
     with open(filename, 'r') as f:
         obj = f.read()
