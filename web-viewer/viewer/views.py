@@ -9,6 +9,7 @@ from django.template import loader
 from .models import Skull, SimilarityScore, Deformation
 import viewer.utils
 import math
+import json
 
 
 def index(request):
@@ -21,6 +22,26 @@ def wall(request):
     context = {}
     return HttpResponse(template.render(context, request))
 
+def detail(request):
+    template = loader.get_template('viewer/detail.html')
+    id = request.GET['skull']
+    skull = Skull.objects.get(identity=id)
+    skull_type = skull.skull_type
+    similar_skulls = []
+    
+    data = {}        
+    if skull_type == 'injured':
+        if id == 'q1':
+            similar_skulls = ['p49', 'p74', 'p38', 'p39', 'p36']
+        elif id == 'q2':
+            similar_skulls = ['p37', 'p53', 'p51', 'p88', 'p62']
+        else:
+            similar_skulls = ['p69', 'p93', 'p5', 'p75', 'p34']
+
+    data = {'id': id, 'type': skull_type, 'results': similar_skulls}
+    context = {'data': json.dumps(data)}
+    return HttpResponse(template.render(context, request))
+
 def skulls(request):
     id = request.GET['skull']
     dec = int(request.GET['dec'])
@@ -28,9 +49,8 @@ def skulls(request):
     # print('HAHA', id, dec, skull.obj_path_decimated)
     filename = skull.obj_path
     if dec == 1:
-        filename = filename.replace('models', 'decimated')
+        filename = skull.obj_decimated
     
-    print(filename)
     with open(filename, 'r') as f:
         obj = f.read()
         return HttpResponse(obj)
@@ -77,8 +97,6 @@ def show_skulls(request):
             'status': 0
         }
     return JsonResponse(context)
-def detail(request):
-    return HttpResponse('DETAIL')
 
 def skull_detail(request):
     template = loader.get_template('viewer/index.html')

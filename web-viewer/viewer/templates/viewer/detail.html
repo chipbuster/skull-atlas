@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+
+    <title>Skull Atlas</title>
+
+    <link rel="stylesheet" href="/static/css/reset.css" />
+    <!--<link rel="stylesheet" href="/static/css/ui-lightness/jquery-ui-1.8.13.custom.css" />-->
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/static/css/detail.css" />
+</head>
+
+<body>
+
+    <header>
+        <h1> &nbsp Skull Atlas</h1>
+        <hr/>
+    </header>
+    <div id="data-div">
+        {{data}}
+    </div>  
+    <div id="detail-viewer">
+        <div id="left-viewer">
+        </div>
+        <div id="right-viewer">
+        </div>
+    </div>
+    
+    <!-- LIBS -->
+    <script src="/static/lib/jquery-3.2.1.min.js"></script>
+    <script src="/static/lib/bootstrap.min.js"></script>
+    <script src="/static/lib/jquery-ui.js"></script>
+    <script src="/static/lib/underscore.js"></script>
+    <script src="/static/lib/backbone.js"></script>
+    <script src="/static/lib/three.js"></script>
+    <script src="/static/lib/orbitcontrols.js"></script>
+    <script src="/static/lib/detector.js"></script>
+
+    <!-- JAVASCRIPT SRC -->
+    <script src="/static/src/OBJLoader.js"></script>
+    <script src="/static/src/skulldetail.js"></script>
+
+</body>
+
+</html>

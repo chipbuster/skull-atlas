@@ -1,0 +1,21 @@
+#data-div {
+    display: none;
+}
+
+#detail-viewer {
+    position: relative;    
+}
+
+#left-viewer {
+    position: absolute;
+}
+
+#right-viewer {
+    position: absolute;
+}
+
+#detail-viewer canvas {
+	position: absolute;
+	outline: 1px solid black;
+}
+
