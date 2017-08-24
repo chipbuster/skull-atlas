@@ -32,19 +32,28 @@ skullviewer.Manager = Backbone.View.extend({
     loadClick: function() {
         console.log('On load Click');
         var context = this;
-        var skull1_id = 'query';
-        var skull2_id = 'result';
-        $.get('similar/?skull1=query&skull2=result', function (data) {
-            context.loadObjToScene(skull1_id, data['skull1_obj']);
-            context.loadObjToScene(skull2_id, data['skull2_obj']);
+        var skull1_id = 'p49';
+        var skull2_id = 'q1';
+        document.getElementById("result-load").style.display = "block";
+        document.getElementById("query-load").style.display = "block";
+        document.getElementById("result-canvas").style.display = "none";
+        document.getElementById("query-canvas").style.display = "none";
+        $.get('similar/?skull1='+skull1_id+'&skull2='+skull2_id, function (data) {
+            document.getElementById("result-load").style.display = "none";
+            document.getElementById("query-load").style.display = "none";
+            document.getElementById("result-canvas").style.display = "block";
+            document.getElementById("query-canvas").style.display = "block";
+            context.loadObjToScene('query', data['skull2_obj']);
+            context.loadObjToScene('result', data['skull1_obj']);
+
         });
     },
 
     deformClick: function() {
         console.log('On deform Click');
         var context = this;
-        var skull1_id = 'result';
-        var skull2_id = 'query';
+        var skull1_id = 'p49';
+        var skull2_id = 'q1';
         var callback = function (data) {
             frame = parseInt(data['frame']);
             maxframe = parseInt(data['max_frame'])
