@@ -1,6 +1,10 @@
 Skull Atlas 2016
 ================
 
+**This repository is now archived.** Use this code at your own risk: it is dated
+and has at least one known security vulnerability (related to grunt) and was
+never designed to be used with untrusted data in the first place.
+
 ![Travis Status](https://travis-ci.com/chipbuster/skull-atlas.svg?token=JKmHgBdX7axXPFzjazNA)
 
 ```
